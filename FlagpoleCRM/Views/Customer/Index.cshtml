@@ -1,0 +1,726 @@
+﻿@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+    var audienceId = "0";
+    var audienceName = "";
+    var audienceDescription = "";
+    var audienceLimit = 0;
+    var audienceIsDynamic = 1;
+}
+
+<main class="page-content">
+    <div class="breadcrumb-title pe-3">Customer List (<span id="total-leads"></span>)</div>
+    <hr>
+    <div style="display:flex">
+        <div style="display:flex; align-items: center">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="segment-options" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    All audiences
+                </button>
+                <div class="dropdown-menu" aria-labelledby="segment-options" id="audience-list"></div>
+            </div>
+            <span style="margin-left:20px">Result: <b id="matching-leads"></b> (<span id="matching-ratio"></span>)</span>
+        </div>
+        <div id="filter-wrapper" style="margin-left: auto">
+            <a class="btn btn-primary" id="save-audience" data-bs-toggle="modal" data-bs-target="#save-audience-modal" hidden>Save audience</a>
+            <a class="btn btn-danger" id="remove-audience" data-bs-toggle="modal" data-bs-target="#remove-audience-modal" hidden>Remove audience</a>
+            <a class="btn btn-warning" id="reset-query" hidden>Reset filter</a>
+            <button class="btn btn-secondary" data-bs-toggle="offcanvas" data-bs-target="#customerFilter" aria-controls="customerFilter">
+                <i class="bi bi-funnel-fill" style="margin:0"></i> Filter
+            </button>
+        </div>
+    </div>
+    <div class="table-responsive" style="margin-top:20px">
+        <table id="customer-list" class="table table-striped table-bordered custom-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Customer ID</th>
+                    <th>Full Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Birthday</th>
+                    <th>RFM Group</th>
+                    <th>Tags</th>
+                    <th>Total Orders</th>
+                    <th>Total Spent</th>
+                    <th>Average Order Value</th>
+                    <th>Total Products</th>
+                    <th>Total Unique Products</th>
+                    <th>Best-selling Products</th>
+                    <th>Total Cancelled Orders</th>
+                    <th>Complete Payment Times</th>
+                    <th>Total Discount Codes Used</th>
+                    <th>Address</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    @*Filter tab*@
+    <div class="switcher-body">
+        <div class="offcanvas offcanvas-end shadow border-start-0 p-2" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="customerFilter" style="visibility: visible;" aria-modal="true" role="dialog">
+            <div class="offcanvas-header border-bottom">
+                <h5 class="offcanvas-title">Filter</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div id="filter-builder"></div>
+            </div>
+            <div style="text-align: right">
+                <a class="btn btn-primary" id="apply-filter" style="width:20%">Apply</a>
+            </div>
+        </div>
+    </div>
+
+    @*Popup customer detail*@
+    <div class="modal fade" id="info-detail-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 1000px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Customer Detail</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive-sm">
+                        <table id="customerDetail" class="table table-bordered table-hover table-striped w-100 text-color1">
+                            <thead class="fs-md">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Address</th>
+                                    <th>Source</th>
+                                    <th>Original ID</th>
+                                </tr>
+                            </thead>
+                            <tbody class="fs-md">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*Save audience popup*@
+    <div class="modal fade" id="save-audience-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 500px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Save audience</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="save-audience-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="add-audience">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*Delete audience confirmation*@
+    <div class="modal fade" id="remove-audience-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 400px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete audience</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure to delete this audience?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="remove-audience-confirm">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+@section Script {
+    <script>
+        var customerTable, customerDetail;
+
+        function currentSegment(item) {
+            $('#segment-options').html(item.innerHTML);
+            audienceId = item.value;
+            if (item.value == 0) {
+                $('#filter-builder').queryBuilder('reset');
+                loadCustomers(0);
+                $('#save-audience').attr('hidden', true);
+                $('#remove-audience').attr('hidden', true);
+                $('#reset-query').attr('hidden', true);
+                setAudienceDetail("0", "", "", 1, 0);
+                if (audienceId == 0) {
+                    loadSaveAudiencePopup();
+                }
+            }
+            else {
+                $.ajax({
+                    url: `@Url.Action("GetAudienceByName", "Customer")?name=${item.innerHTML}&websiteId=${localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE')}`,
+                    type: 'get',
+                    success: (result) => {
+                        if (!result.isSuccessful) {
+                            toastr_call('error', 'Error', result.message);
+                        }
+                        else {
+                            var audience = result.data;
+                            setAudienceDetail(audience.id, audience.name, audience.description, audience.isDynamic, audience.limit);
+                            if (audienceId == audience.id) {
+                                loadSaveAudiencePopup();
+                            }
+                            var rules = JSON.parse(audience.rulesQueryBuilder);
+                            if (rules) {
+                                $('#filter-builder').queryBuilder('setRules', rules);
+                                loadCustomers(rules.limit);
+                            }
+                            else {
+                                return;
+                            }
+                        }
+                    }
+                });
+                $('#save-audience').attr('hidden', false);
+                $('#remove-audience').attr('hidden', false);
+                $('#reset-query').attr('hidden', false);
+            }
+        }
+
+        var filters = [];
+        $.ajax({
+            url: `@Url.Action("GetCustomerFields", "CustomerField")`,
+            type: 'get',
+            success: (fields) => {
+                fields.forEach((field, index) => {
+                    var obj = {
+                        id: field.keyName,
+                        label: field.displayName,
+                        type: field.dataType
+                    };
+                    switch (field.keyName) {
+                        case 'RFM.RFMGroup':
+                            obj.input = 'select';
+                            obj.values = {
+                                1: 'Champions',
+                                2: 'Loyal Customers',
+                                3: 'Potential Loyalist',
+                                4: 'Recent Customers',
+                                5: 'Promising',
+                                6: 'Customers Needing Attention',
+                                7: 'About To Sleep',
+                                8: 'At Risk',
+                                9: 'Can’t Lose Them',
+                                10: 'Hibernating',
+                                11: 'Lost'
+                            };
+                            obj.operators = ['equal']
+                            break;
+                        case 'ChannelSubscribes':
+                            obj.input = 'select';
+                            obj.values = {
+                                1: 'Email'
+                            };
+                            obj.operators = ['equal']
+                            break;
+                        case 'OrgCreatedDate':
+                        case 'ModifiedDate':
+                        case 'Birthday':
+                            obj.validation = {
+                                format: 'YYYY-MM-DD'
+                            };
+                            obj.plugin = 'datepicker';
+                            obj.plugin_config = {
+                                format: 'yyyy-mm-dd',
+                                todayBtn: 'linked',
+                                todayHighlight: true,
+                                autoclose: true
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    filters.push(obj);
+                });
+
+                var options = {
+                    plugins: ['bt-tooltip-errors'],
+                    filters: filters
+                };
+                $('#filter-builder').queryBuilder(options);
+            }
+        });
+
+        function loadCustomers(limit) {
+            var condition;
+            var rulesQueryBuilder;
+            try {
+                condition = $('#filter-builder').queryBuilder('getSQL', false);
+                rulesQueryBuilder = JSON.stringify($('#filter-builder').queryBuilder('getRules'));
+            }
+            catch {
+                condition = '';
+                rulesQueryBuilder = '';
+            }
+            customerTable = $('#customer-list').DataTable({
+                dom: "<'.row ml-0 fs-md'>" +
+                    "<'row'<'col-sm-12 'tr>>" +
+                    "<'row'<'#custom-paging.col-md-12 d-flex align-items-baseline fs-md'<'mr-4'l>i<'ml-auto'p>>>",
+                processing: true,
+                serverSide: true,
+                pagingType: 'simple',
+                autoWidth: true,
+                scrollX: true,
+                ajax: {
+                    url: `@Url.Action("GetCustomers", "Customer")`,
+                    type: 'post',
+                    data: function (model) {
+                        if (condition == null) {
+                            model.condition = '';
+                        }
+                        else {
+                            model.condition = condition.sql;
+                        }
+                        model.email = '@TempData["email"]';
+                        model.websiteId = localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE');
+                        if (model.order[0].column === 0) {
+                            if (limit > 0) {
+                                model.limit = limit;
+                                model.order[0].dir = "asc";
+                            }
+                            else {
+                                model.order[0].dir = "desc";
+                            }
+                            model.order[0].column = 18;
+                        }
+                    },
+                },
+                drawCallback: function (data) {
+                    var record = data.json;
+                    $('#total-leads').html(record.recordsTotal);
+                    $('#matching-leads').html(record.recordsFiltered);
+                    $('#matching-ratio').html(record.ratio);
+                    localStorage.setItem('@Common.Constant.CookiesName.ELASTIC_QUERY', record.jsonElasticQuery);
+                    localStorage.setItem('@Common.Constant.CookiesName.SQL_QUERY', record.sqlQuery);
+                    localStorage.setItem('@Common.Constant.CookiesName.RULES_QUERY', rulesQueryBuilder);
+                },
+                columns: getColumns(),
+                bDestroy: true
+            })
+        }
+
+        function getColumns() {
+            let arrColumn = [
+                {
+                    data: "index",
+                    class: "text-center text-nowrap",
+                    width: '15px',
+                    orderable: false
+                },
+                {
+                    data: "id",
+                    render: function (data, type, row) {
+                        if (row.id != undefined && row.id != null && row.id != '') {
+                            return row.id;
+                        }
+                        return '-';
+                    },
+                    class: "text-nowrap",
+                    orderable: false
+                },
+                {
+                    data: "contacts.fullName",
+                    render: function (data, type, row) {
+                        if (row.source.contacts.length > 0) {
+                            var str = getFirstDataObjInList(row.source.contacts, 'fullName');
+                            if (row.source.nameCount > 1) {
+                                str += '</br>' + `<a href="javascript:" class="seemore-link" data-bs-toggle="modal" data-bs-target="#info-detail-modal" onclick="loadCustomerDetail('${row.id}')">See more (${row.source.nameCount})</a>`;
+                            }
+                            return str;
+                        }
+                        return "-";
+                    },
+                    class: "text-nowrap",
+                    orderable: false
+                },
+                {
+                    data: "contacts.phone",
+                    render: function (data, type, row) {
+                        if (row.source.contacts.length > 0) {
+                            var str = getFirstDataObjInList(row.source.contacts, 'phone');
+                            if (row.source.phoneCount > 1) {
+                                str += '</br>' + `<a href="javascript:" class="seemore-link" data-bs-toggle="modal" data-bs-target="#info-detail-modal" onclick="loadCustomerDetail('${row.id}')">See more (${row.source.phoneCount})</a>`;
+                            }
+                            return str;
+                        }
+                        return "-";
+                    },
+                    class: "text-nowrap",
+                    orderable: false
+                },
+                {
+                    data: "contacts.email",
+                    render: function (data, type, row) {
+                        if (row.source.contacts.length > 0) {
+                            var str = getFirstDataObjInList(row.source.contacts, 'email');
+                            if (row.source.emailCount > 1) {
+                                str += '</br>' + `<a href="javascript:" class="seemore-link" data-bs-toggle="modal" data-bs-target="#info-detail-modal" onclick="loadCustomerDetail('${row.id}')">See more (${row.source.emailCount})</a>`;
+                            }
+                            return str;
+                        }
+                        return "-";
+                    },
+                    class: "text-nowrap",
+                    orderable: false
+                },
+                {
+                    data: "source.birthday",
+                    name: "Birthday",
+                    render: function (data, type, row) {
+                        return row.source.birthdayText;
+                    },
+                    class: 'text-nowrap',
+                    orderable: true
+                },
+                {
+                    data: "source.rfm.rfmgroup",
+                    name: "RFM.RFMGroup",
+                    render: function (data, type, row) {
+                        return row.source.rfmView;
+                    },
+                    class: "text-nowrap",
+                    orderable: true
+                },
+                {
+                    data: "source.tagsView",
+                    class: "text-nowrap",
+                    orderable: false
+                },
+                {
+                    data: "source.totalOrders",
+                    name: "TotalOrders",
+                    class: "text-nowrap",
+                    orderable: true
+                },
+                {
+                    data: "source.totalSpent",
+                    name: "TotalSpent",
+                    render: function (data, type, row) {
+                        return customFormatNumber(data);
+                    },
+                    class: "text-nowrap",
+                    orderable: true
+                },
+                {
+                    data: "source.averageOrderValue",
+                    name: "AverageOrderValue",
+                    render: function (data, type, row) {
+                        return customFormatNumber(data);
+                    },
+                    class: "text-nowrap",
+                    orderable: true
+                },
+                {
+                    data: "source.totalProducts",
+                    name: "TotalProducts",
+                    class: "text-nowrap",
+                    orderable: true
+                },
+                {
+                    data: "source.totalUniqueProducts",
+                    name: "TotalUniqueProducts",
+                    class: "text-nowrap",
+                    orderable: true
+                },
+                {
+                    data: "source.bestSellingView",
+                    class: "text-nowrap",
+                    orderable: false
+                },
+                {
+                    data: "source.totalCancelledOrders",
+                    name: "TotalCancelledOrders",
+                    class: "text-nowrap",
+                    orderable: true
+                },
+                {
+                    data: "source.completePaymentTimes",
+                    name: "CompletePaymentTimes",
+                    class: "text-nowrap",
+                    orderable: true
+                },
+                {
+                    data: "source.totalDiscountCodeUsed",
+                    name: "TotalDiscountCodeUsed",
+                    class: "text-nowrap",
+                    orderable: true
+                },
+                {
+                    data: "contacts.address",
+                    render: function (data, type, row) {
+                        if (row.source.contacts.length > 0) {
+                            var str = getFirstDataObjInList(row.source.contacts, 'address');
+                            if (row.source.addressCount > 1) {
+                                str += '</br>' + `<a href="javascript:" class="seemore-link" data-bs-toggle="modal" data-bs-target="#info-detail-modal" onclick="loadCustomerDetail('${row.id}')">See more (${row.source.addressCount})</a>`;
+                            }
+                            return str;
+                        }
+                        return "-";
+                    },
+                    class: "text-nowrap",
+                    orderable: false
+                },
+                {
+                    data: "source.orgCreatedAt",
+                    name: "OrgCreatedDate",
+                    render: function (data, type, row) {
+                        return row.source.orgCreatedAtView;
+                    },
+                    class: 'text-nowrap',
+                    orderable: true
+                },
+            ];
+            return arrColumn;
+        }
+
+        function loadCustomerDetail(id) {
+            customerDetail = $('#customerDetail').DataTable({
+                processing: true,
+                autoWidth: true,
+                ajax: {
+                    url: `@Url.Action("GetCustomerDetail", "Customer")?id=${id}`,
+                    type: 'post'
+                },
+                columns: getDetailColumns(),
+                bDestroy: true
+            });
+
+            customerDetail.on('order.dt search.dt', function () {
+                customerDetail.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+        }
+
+        function getDetailColumns() {
+            let arr = [
+                {
+                    data: "fullName",
+                    orderable: false
+                },
+                {
+                    data: "fullName",
+                    class: 'text-nowrap',
+                    orderable: false
+                },
+                {
+                    data: "email",
+                    class: 'text-nowrap',
+                    orderable: false
+                },
+                {
+                    data: "phone",
+                    class: 'text-nowrap',
+                    orderable: false
+                },
+                {
+                    data: "address",
+                    class: 'text-nowrap',
+                    orderable: false
+                },
+                {
+                    data: "orgSrc",
+                    class: 'text-nowrap',
+                    orderable: false
+                },
+                {
+                    data: "orgId",
+                    class: 'text-nowrap',
+                    orderable: false
+                }
+            ];
+            return arr;
+        }
+
+        function getFirstDataObjInList(source, name) {
+            try {
+                source = source.filter(x => x[name]);
+                return source && source.length > 0 ? source[0][name] : '-';
+            }
+            catch (ex) {
+                return '-';
+            }
+        }
+
+        $('#apply-filter').click(function () {
+            loadCustomers(0);
+            $('#save-audience').attr('hidden', false);
+            $('#reset-query').attr('hidden', false);
+            $('#remove-audience').attr('hidden', true);
+        });
+
+        function resetQuery() {
+            $('#segment-options').html('All audiences');
+            $('#filter-builder').queryBuilder('reset');
+            $('#reset-query').attr('hidden', true);
+            $('#save-audience').attr('hidden', true);
+            $('#remove-audience').attr('hidden', true);
+            loadCustomers(0);
+        }
+        $('#reset-query').click(function () {
+            resetQuery();
+        });
+
+        $('#remove-audience-confirm').click(function () {
+            $('.loading').attr('hidden', false);
+            $.ajax({
+                url: `@Url.Action("DeleteAudience","Customer")?id=${audienceId}`,
+                type: 'get',
+                success: (result) => {
+                    $('.loading').attr('hidden', true);
+                    if (!result.isSuccessful) {
+                        toastr_call('error', 'Error', result.message);
+                    }
+                    else {
+                        toastr_call('success', 'Success', "Delete audience successfully");
+                    }
+                    $('#remove-audience-modal').modal('toggle');
+                    $('#segment-options').html('All audiences');
+                    resetQuery();
+                    loadAudiences();
+                }
+            })
+        });
+
+        function loadSaveAudiencePopup() {
+            $.ajax({
+                url: `@Url.Action("LoadSaveAudiencePopup","Customer")`,
+                type: 'post',
+                data: {
+                    Id: audienceId,
+                    Name: audienceName,
+                    Description: audienceDescription,
+                    IsDynamic: audienceIsDynamic,
+                    Limit: audienceLimit
+                },
+                success: (data) => {
+                    $('#save-audience-body').html(data);
+                }
+            });
+        }
+
+        $('#add-audience').click(function () {
+            var id = $('#audience-id').val();
+            var name = $('#audience-name').val();
+            var description = $('#audience-description').val();
+            var type = $('input[name="audience-type"]:checked').val();
+            var limit = $('#audience-limit').val();
+            var websiteId = localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE');
+            if (!name || !type || !limit) {
+                toastr_call('error', 'Error', "Required fields could not be blank!");
+            }
+            else {
+                if (limit < 0) {
+                    toastr_call('error', 'Error', "Limit number is not valid");
+                }
+                else {
+                    loadCustomers(limit);
+                    $('#segment-options').html(name);
+                    $('.loading').attr('hidden', false);
+                    setTimeout(function () {
+                        var elasticQuery = localStorage.getItem('@Common.Constant.CookiesName.ELASTIC_QUERY');
+                        var sqlquery = localStorage.getItem('@Common.Constant.CookiesName.SQL_QUERY');
+                        var rulesQueryBuilder = localStorage.getItem('@Common.Constant.CookiesName.RULES_QUERY');
+                        $.ajax({
+                            url: `@Url.Action("AddAudience", "Customer")`,
+                            type: 'post',
+                            data: { id, name, description, type, limit, elasticQuery, sqlquery, websiteId, rulesQueryBuilder },
+                            success: (result) => {
+                                if (!result.isSuccessful) {
+                                    toastr_call('error', 'Error', result.message);
+                                }
+                                else {
+                                    toastr_call('success', 'Success', "Add new audience successfully!");
+                                    $('#remove-audience').attr('hidden', false);
+                                    $.ajax({
+                                        url: `@Url.Action("GetAudienceByName", "Customer")?name=${name}&websiteId=${localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE')}`,
+                                        type: 'get',
+                                        success: (result) => {
+                                            audienceId = result.data.id;
+                                        }
+                                    })
+                                }
+                                loadAudiences();
+                            },
+                            complete: () => {
+                                $('.loading').attr('hidden', true);
+                            }
+                        })
+                    }, 1500);
+                }
+            }
+        });
+
+        function loadAudiences() {
+            $('#audience-list').html('');
+            $.ajax({
+                url: `@Url.Action("GetAudiences", "Customer")?websiteId=${localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE')}`,
+                type: 'get',
+                success: (result) => {
+                    $('#audience-list').append(`<button class="dropdown-item" onclick="currentSegment(this)" value="0">All audiences</button>`);
+                    result.forEach((value, index) => {
+                        $('#audience-list').append(`<button class="dropdown-item" onclick="currentSegment(this)" value="${value.id}">${value.name}</button>`);
+                    });
+                }
+            })
+        }
+
+        function setAudienceDetail(id, name, description, type, limit) {
+            audienceId = id;
+            audienceName = name;
+            audienceDescription = description;
+            audienceIsDynamic = type;
+            audienceLimit = limit;
+        }
+
+        $(document).ready(function () {
+            loadCustomers(0);
+            loadAudiences();
+            setAudienceDetail("0", "", "", 1, 0);
+            loadSaveAudiencePopup();
+        })
+
+        function customFormatNumber(num) {
+            numstr = (num + '').trim();
+            var n = numstr;
+            var m = '';
+            if (numstr.includes('.')) {
+                n = numstr.split('.')[0];
+                m = numstr.split('.')[1];
+            }
+            var cnt = 1;
+            for (let i = 1; i < n.length - 1; i++) {
+                if (n[n.length - i] == ',') {
+                    continue;
+                }
+                if ((cnt + 1) % 3 == 0) {
+                    n = n.substr(0, n.length - i - 1) + ',' + n.substr(n.length - i - 1);
+                }
+                cnt++;
+            }
+
+            return m != '' ? n + '.' + m : n;
+        }
+
+        $('#choose-websites').change(function () {
+            loadCustomers(0);
+            loadAudiences();
+        })
+    </script>
+}

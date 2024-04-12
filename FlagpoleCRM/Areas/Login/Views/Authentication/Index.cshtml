@@ -1,0 +1,425 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FlagpoleCRM</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/FlagpoleCRM.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/login/AdminLTE.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+        }
+
+        .bg {
+            background-image: url('/img/brand/background-login.png');
+            background-repeat: no-repeat;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+        }
+
+        #login-box, #confirm-box {
+            position: fixed !important;
+            width: 30%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .login-box-body {
+            background-color: #464646;
+            -webkit-box-shadow: 0 0 5px #bababa;
+        }
+
+        .form-login {
+            margin-bottom: 20px;
+        }
+
+        .login-main-btn {
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .second-btn {
+            width: 100%;
+            background-color: #dedede;
+            color: black;
+        }
+
+        .second-btn:hover {
+            background-color: #367fa9;
+            color: white
+        }
+
+        .invalid-ip {
+            color: #EE9EA5;
+        }
+
+        .disable-btn {
+            pointer-events: none;
+        }
+
+        .test {
+            color:red;
+        }
+    </style>
+
+    <div class="bg"></div>
+    <div id="login-box">
+        <div class="login-box-body">
+            <div style="text-align:center">
+                <img src="~/img/brand/logo-white.png" class="form-login" style="width:56px;height:80px" />
+                <p style="color:white">Flagpole CRM</p>
+            </div>
+            <input type="email" class="form-control form-login" placeholder="Email" id="email">
+            <div class="invalid-ip form-login" id="email-error"></div>
+            <input type="password" class="form-control form-login" placeholder="Password" id="password">
+            <div class="invalid-ip form-login" id="invalid-password" hidden>
+                Please provide a password
+            </div>
+            <input type="password" class="form-control form-login" placeholder="Retype Password" id="retype-password" hidden>
+            <div class="invalid-ip form-login" id="invalid-retype-pass" hidden>
+                Retyped password is not correct
+            </div>
+            <div id="wrap-login-buttons">
+                <a class="btn btn-primary btn-block btn-flat login-main-btn" id="sign-in-btn">
+                    <span class="spinner-border spinner-border-sm" role="status" id="load-signin" hidden></span>
+                    Sign In
+                </a>
+                <a class="btn btn-block btn-flat second-btn" id="register-toggle">
+                    Don't have account yet? Register now
+                </a>
+            </div>
+            <div id="wrap-register-buttons" hidden>
+                <a class="btn btn-primary btn-block btn-flat login-main-btn" id="sign-up-btn">
+                    <span class="spinner-border spinner-border-sm" role="status" id="load-signup" hidden></span>
+                    Sign up
+                </a>
+                <a class="btn btn-block btn-flat second-btn" id="login-toggle">
+                    Already have account? Login now
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirm-box" hidden>
+        <div class="login-box-body">
+            <div style="text-align:center">
+                <img src="~/img/brand/logo-white.png" class="form-login" style="width:56px;height:80px" />
+                <p style="color:white">Flagpole CRM</p>
+            </div>
+            <div style="text-align: center">
+                <span id="login-message" class="invalid-ip"></span>
+                <div id="confirm-box-content" style="color:white" hidden>
+                    <span>
+                        We have just sent verification code to your email.
+                        <br />Please enter the code to continue
+                    </span>
+                    <input type="text" class="form-control" placeholder="Verification code" id="verification-code" style="margin-top:20px">
+                    <div class="invalid-ip" id="invalid-verification-code" hidden>
+                        Please provide verification code
+                    </div>
+                    <div class="invalid-ip" id="incorrect-otp" hidden>
+                        Incorrect OTP
+                    </div>
+                    <div class="form-login"></div>
+                    <a class="btn btn-primary" id="verify-btn">
+                        <span class="spinner-border spinner-border-sm" role="status" id="load-verification" hidden></span>
+                        Verify now
+                    </a>
+                    <a class="btn btn-secondary" id="send-verify-btn">
+                        <span class="spinner-border spinner-border-sm" role="status" id="load-send-verification" hidden></span>
+                        <span id="otp-remaining-time" hidden></span> Send again
+                    </a>
+                </div>
+                
+                <div style="color:white" id="complete-register" hidden>
+                    <span>You are ready to go!</span> <br />
+                    <a class="btn btn-primary" id="back-to-login">Back to login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        var webUrl;
+        var currentEmail;
+
+        $(document).ready(function() {
+            $.ajax({
+                url: `/login/authentication/GetWebUrl`,
+                type: 'get',
+                success: function (data) {
+                    webUrl = data;
+                }
+            });
+        })
+
+        $('#register-toggle').click(function () {
+            $('#retype-password').attr('hidden', false);
+            $('#wrap-register-buttons').attr('hidden', false);
+            $('#wrap-login-buttons').attr('hidden', true);
+            reset();
+        });
+
+        $('#login-toggle').click(function () {
+            $('#retype-password').attr('hidden', true);
+            $('#wrap-register-buttons').attr('hidden', true);
+            $('#wrap-login-buttons').attr('hidden', false);
+            reset();
+        });
+
+        $('#sign-in-btn').click(async function () {
+            var valid = checkValidate(1);
+            if (valid == false) {
+                return;
+            }
+            else {
+                $('#load-signin').attr('hidden', false);
+                $('#sign-in-btn').addClass('disable-btn'); 
+                $('#send-verify-btn').addClass('disable-btn');
+                currentEmail = $('#email').val();
+
+                var obj = {
+                    email: $('#email').val(),
+                    password: $('#password').val()
+                };
+
+                $.ajax({
+                    url: `/login/authentication/login`,
+                    data: obj,
+                    type: 'post',
+                    success: async function (data) {
+                        $('#load-signin').attr('hidden', true);
+                        $('#sign-in-btn').removeClass('disable-btn');
+                        if (data.isSuccessful) {
+                            if (data.message) {
+                                if (data.message == "OTP Required") {
+                                    $('#confirm-box').attr('hidden', false);
+                                    $('#login-box').attr('hidden', true);
+                                    $('#confirm-box-content').attr('hidden', false);
+                                    await countOTPRemainingTime();
+                                }
+                                else {
+                                    $('#email-error').html(data.message);
+                                }
+                            }
+                            else {
+                                createToken(data.data);
+                            }
+                        }
+
+                    },
+                    error: () => { $('#load-signin').attr('hidden', true); $('#sign-in-btn').removeClass('disable-btn'); }
+                });
+            }
+        })
+
+        $('#sign-up-btn').click(async function () {
+            var valid = checkValidate(2);
+            if (valid == false) {
+                return;
+            }
+            else {
+                $('#load-signup').attr('hidden', false);
+                $('#sign-up-btn').addClass('disable-btn');
+                $('#send-verify-btn').addClass('disable-btn');
+                currentEmail = $('#email').val();
+
+                var obj = {
+                    email: $('#email').val(),
+                    password: $('#password').val(),
+                    retypedPassword: $('#retype-password').val()
+                };
+
+                $.ajax({
+                    url: `/login/authentication/Register`,
+                    data: obj,
+                    type: 'post',
+                    success: async function (data) {
+                        $('#load-signup').attr('hidden', true);
+                        $('#login-message').html('');
+                        $('#sign-up-btn').removeClass('disable-btn');
+                        if (data.isSuccessful) {
+                            if (data.message) {
+                                if (data.message != "OTP Required") {
+                                    $('#email-error').html(data.message);
+                                    return;
+                                }
+                            }
+                            $('#confirm-box').attr('hidden', false);
+                            $('#login-box').attr('hidden', true);
+                            $('#confirm-box-content').attr('hidden', false);
+                            await countOTPRemainingTime();
+                        }
+                        else {
+                            $('#login-message').html(`${data.message}`);
+                        }
+                    },
+                    error: () => { $('#load-signup').attr('hidden', true); $('#sign-up-btn').removeClass('disable-btn');}
+                });
+            }
+        })
+
+        $('#verify-btn').click(function() {
+            var code = $('#verification-code').val();
+            if (!code) {
+                $('#invalid-verification-code').attr('hidden', false);
+                return;
+            }
+            else {
+                $('#load-verification').attr('hidden', false);
+                $('#verify-btn').addClass('disable-btn');
+                var obj = {
+                    Email: currentEmail,
+                    Code: code
+                };
+                $.ajax({
+                    url: `/login/authentication/ConfirmOTP`,
+                    data: obj,
+                    type: 'post',
+                    success: function (data) {
+                        $('#load-verification').attr('hidden', true);
+                        $('#verify-btn').removeClass('disable-btn');
+                        if (data.isSuccessful) {
+                            $('#login-message').html('');
+                            if (data.message) {
+                                $('#incorrect-otp').attr('hidden', false);
+                            }
+                            else {
+                                $('#confirm-box-content').attr('hidden', true);
+                                $('#complete-register').attr('hidden', false);
+                            }
+                        }
+                        else {
+                            if (data.message == 'Invalid email') {
+                                window.location.replace(webUrl + "/login/authentication/index");
+                            }
+                            $('#login-message').html(`${data.message}`);
+                        }
+                    },
+                    error: () => { $('#load-verification').attr('hidden', true); $('#verify-btn').removeClass('disable-btn'); }
+
+                })
+            }
+            
+        })
+
+        $('#send-verify-btn').click(async function() {
+            $('#load-send-verification').attr('hidden', false);
+            $('#send-verify-btn').addClass('disable-btn');
+            $.ajax({
+                url: `/login/authentication/SendOTP?email=${currentEmail}`,
+                type: 'get',
+                success: function (data) {
+                    $('#load-send-verification').attr('hidden', true);
+                    $('#login-message').html(``);
+                    if (!data.isSuccessful) {
+                        $('#login-message').html(`${data.message}`);
+                    }
+                },
+                error: () => { $('#load-send-verification').attr('hidden', true); }
+            });
+
+            await countOTPRemainingTime();
+        })
+
+        async function countOTPRemainingTime() {
+            $('#otp-remaining-time').attr('hidden', false);
+            for (let i = 60; i >= 0; i--) {
+                $('#otp-remaining-time').html('');
+                $('#otp-remaining-time').html('(' + i + 's)' + ' ');
+                await delay(1000);
+            }
+            $('#otp-remaining-time').html('');
+            $('#send-verify-btn').removeClass('disable-btn');
+        }
+
+        $('#back-to-login').click(function() {
+            window.location.replace(webUrl + "/login/authentication/index");
+        });
+
+        async function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function checkValidate(type) {
+            var email = $('#email').val();
+            var password = $('#password').val();
+            var retypePassword = $('#retype-password').val();
+            var valid = true;
+
+            if (!email) {
+                $('#email-error').html('Please provide a valid email');
+                valid = false;
+            }
+
+            var pattern = /\b[A-Za-z0-9._%+-]+@@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/;
+            if (!pattern.test(email)) {
+                $('#email-error').html('Please provide a valid email');
+                valid = false;
+            }
+
+            if (!password) {
+                $('#invalid-password').attr('hidden', false);
+                valid = false;
+            }
+            if (type === 2) {
+                if (!retypePassword || password != retypePassword) {
+                    $('#invalid-retype-pass').attr('hidden', false);
+                    valid = false;
+                }
+            }
+            return valid;
+        }
+
+        function createToken(email) {
+            $.ajax({
+                url: `/login/authentication/CreateToken?email=` + email,
+                type: 'post',
+                success: function (data) {
+                    if (data.isSuccessful === true) {
+                        window.location.replace(webUrl + "/home/index");
+                    }
+                },
+            })
+        }
+
+        $('#email').keyup(function () {
+            $('#email-error').html('');
+        })
+        $('#password').keyup(function () {
+            $('#invalid-password').attr('hidden', true);
+            $('#email-error').html('');
+        })
+        $('#retype-password').keyup(function () {
+            $('#invalid-retype-pass').attr('hidden', true);
+        })
+        $('#verification-code').keyup(function () {
+            $('#invalid-verification-code').attr('hidden', true);
+            $('#incorrect-otp').attr('hidden', true);
+            $('#login-message').html('');
+        })
+
+        function reset() {
+            $('#email-error').html('');
+            $('#email').val('');
+            $('#password').val('');
+            $('#retype-password').val('');
+            $('#invalid-password').attr('hidden', true);
+            $('#invalid-retype-pass').attr('hidden', true);
+        }
+
+    </script>
+</body>
+</html>

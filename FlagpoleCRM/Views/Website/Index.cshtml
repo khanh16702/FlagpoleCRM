@@ -1,0 +1,184 @@
+﻿@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<main class="page-content">
+    <div class="breadcrumb-title pe-3" style="display:flex; justify-content:space-between; align-items:center">
+        Website List
+        @if (ViewBag.WebsiteCount > 0)
+        {
+            <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-website-modal">
+                <i class="bi bi-plus-lg" style="margin: 0"></i> Add website
+            </a>
+        }
+    </div>
+    <hr>
+
+    <div class="modal fade" id="add-website-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered sync-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create new website</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control" id="website-name-2" placeholder="Website name" />
+                    <span id="create-website-error-2" style="color:#E07F81"></span>
+                    <br />
+                    <div style="text-align:right">
+                        <a class="btn btn-primary" data-bs-dismiss="modal" aria-label="Close" id="create-website-2">Create</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (ViewBag.WebsiteCount > 0)
+    {
+        <div class="table-responsive" style="margin-top:20px">
+            <table id="website-list" class="table table-striped table-bordered custom-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Website ID</th>
+                        <th>Url</th>
+                        <th>Has Shopify Data</th>
+                        <th>Has Haravan Data</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    }
+    else
+    {
+        <h4>Create your first website</h4>
+        <input type="text" class="form-control" id="website-name" placeholder="Website name" style="width:50%" />
+        <span id="create-website-error" style="color:#E07F81"></span>
+        <br />
+        <a class="btn btn-primary" id="create-website">Create</a>
+    }
+
+</main>
+
+@section Script {
+    <script>
+        var websiteTable;
+
+        $(document).ready(function () {
+            loadWebsites();
+        })
+
+        function loadWebsites() {
+            $('.loading').css('display', 'block');
+            $.ajax({
+                type: 'get',
+                url: `@Url.Action("GetWebsites", "Website")?accountId=@TempData["id"]`
+            }).done(function (res) {
+                $('.loading').css('display', 'none');
+                websiteTable = $('#website-list').DataTable({
+                    destroy: true,
+                    searching: true,
+                    lengthChange: false,
+                    className: 'dt-body-right',
+                    pageLength: 10,
+                    data: res,
+                    columns: renderColumns,
+                    order: [[5, 'desc']],
+                });
+
+                websiteTable.on('order.dt search.dt', function () {
+                    websiteTable.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                        cell.innerHTML = i + 1;
+                    });
+                }).draw();
+            })
+        }
+
+        var renderColumns = [
+            {
+                data: "index",
+                class: "aligncenter",
+                orderable: false
+            },
+            {
+                data: "guid",
+                class: "aligncenter",
+                orderable: false
+            },
+            {
+                data: "url",
+                class: "aligncenter",
+                orderable: true
+            },
+            {
+                data: "hasShopifyData",
+                class: "aligncenter",
+                orderable: false
+            },
+            {
+                data: "hasHaravanData",
+                class: "aligncenter",
+                orderable: false
+            },
+            {
+                data: "createdDate",
+                class: "aligncenter",
+                orderable: true,
+                render: function (data) {
+                    return data.split('T')[0];
+                }
+            }
+        ];
+
+        function createWebsite(name) {
+            if (name) {
+                $('.loading').css('display', 'block');
+                $.ajax({
+                    url: `/website/CreateWebsite?name=${name}&accountId=@TempData["id"]`,
+                    type: 'post',
+                    success: async function (model) {
+                        $('.loading').css('display', 'none');
+                        if (!model.isSuccessful) {
+                            toastr_call('error', 'Error', 'Error occurs! Please try again later');
+                        }
+                        else {
+                            toastr_call('success', 'Success', 'Create website successfully');
+                            loadWebsites();
+                            loadWebsiteMenu();
+                        }
+                    }
+                })
+            }
+        };
+
+        $('#create-website').click(function () {
+            var name = $('#website-name').val();
+            if (name) {
+                createWebsite(name);
+            }
+            else {
+                $('#create-website-error').html("Your website name could not be blank!");
+            }
+        });
+
+        $('#create-website-2').click(function () {
+            var name = $('#website-name-2').val();
+            if (name) {
+                createWebsite(name);
+            }
+            else {
+                $('#create-website-error-2').html("Your website name could not be blank!");
+            }
+        });
+
+        $('#website-name').keyup(function () {
+            $('#create-website-error').html('');
+        });
+
+        $('#website-name-2').keyup(function () {
+            $('#create-website-error-2').html('');
+        });
+
+    </script>
+}

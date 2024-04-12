@@ -1,0 +1,57 @@
+﻿@using FlagpoleCRM.Models
+@model Audience
+@{
+    var warning = "By choosing this option, you agree that the customers which are displayed in this audience can be different from actual data";
+}
+
+<style>
+    .mark-required-field {
+        color: #EE9EA5;
+    }
+
+    #static-warning {
+        color: #F1E50E;
+    }
+</style>
+
+<input type="hidden" id="audience-id" value="@Model.Id"/>
+<label>Audience name <span class="mark-required-field">*</span></label>
+<input type="text" class="form-control mb-2" id="audience-name" value="@Model.Name" />
+<label>Description</label>
+<input type="text" class="form-control mb-2" id="audience-description" value="@Model.Description" />
+<label>Audience type <span class="mark-required-field">*</span></label>
+<div>
+    @if (Model.IsDynamic) {
+        <input type="radio" name="audience-type" value="1" id="dynamic" checked/>
+        <label for="dynamic">Dynamic</label>
+        <br />
+        <input type="radio" name="audience-type" value="0" id="static" />
+        <label for="static">Static</label>
+        <br />
+        <span id="static-warning"></span>   
+    }
+    else {
+        <input type="radio" name="audience-type" value="1" id="dynamic" />
+        <label for="dynamic">Dynamic</label>
+        <br />
+        <input type="radio" name="audience-type" value="0" id="static" checked/>
+        <label for="static">Static</label>
+        <br />
+        <span id="static-warning">@warning</span>
+    }
+</div>
+<label class="mt-2">Limit <span class="mark-required-field">*</span></label>
+<input type="number" class="form-control" id="audience-limit" value="@Model.Limit" />
+<span><i>Value "0" means there is no limit</i></span>
+
+<script>
+    $('input[name="audience-type"]').change(function () {
+        displayWarning(this.value);
+    });
+    function displayWarning(value) {
+        $('#static-warning').html('');
+        if (value == 0) {
+            $('#static-warning').html('@warning');
+        }
+    }
+</script>
