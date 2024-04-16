@@ -29,7 +29,6 @@
     <Folder Include="wwwroot\assets\plugins\bootstrap-datepicker\css\" />
     <Folder Include="wwwroot\assets\plugins\bootstrap-datepicker\js\" />
     <Folder Include="wwwroot\assets\plugins\jquery-extendext\" />
-    <Folder Include="wwwroot\assets\plugins\nicescroll\css\" />
     <Folder Include="wwwroot\assets\plugins\queryBuilder\css\" />
     <Folder Include="wwwroot\assets\plugins\queryBuilder\js\" />
     <Folder Include="wwwroot\img\temp\" />
