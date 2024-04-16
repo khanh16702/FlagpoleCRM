@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/SyncAudiences/bin/Debug/net6.0
+/SyncAudiences/obj/Debug/net6.0
+/SyncData/obj/Debug/net6.0
+/PushCustomer/obj/Debug/net6.0
+/FlagpoleCRM/obj/Debug/net6.0
+/DataServiceLib/obj/Debug/net6.0
+/DataAPI/obj/Debug/net6.0
+/Common/obj/Debug/net6.0
