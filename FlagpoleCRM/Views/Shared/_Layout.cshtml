@@ -46,14 +46,14 @@
                 <div class="top-navbar-right ms-auto">
                     <ul class="navbar-nav align-items-center">
                         <li class="nav-item dropdown dropdown-user-setting">
-                            <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" data-bs-toggle="dropdown" href="#">
                                 <div class="user-setting d-flex align-items-center">
                                     <img src="@TempData["avatar"]" class="user-img" alt="">
                                 </div>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li>
-                                    <a class="dropdown-item" href="#">
+                                    <div class="dropdown-item personal-dropdown-item">
                                         <div class="d-flex align-items-center">
                                             <img src="@TempData["avatar"]" alt="" class="rounded-circle" width="54" height="54">
                                             <div class="ms-3">
@@ -61,11 +61,11 @@
                                                 <small class="mb-0 dropdown-user-designation text-secondary">@TempData["email"]</small>
                                             </div>
                                         </div>
-                                    </a>
+                                    </div>
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <a class="dropdown-item" href="pages-user-profile.html">
+                                    <a class="dropdown-item personal-dropdown-item" href="/profile/index">
                                         <div class="d-flex align-items-center">
                                             <div class=""><i class="bi bi-person-fill"></i></div>
                                             <div class="ms-3"><span>Profile</span></div>
@@ -73,7 +73,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="authentication-signup-with-header-footer.html">
+                                    <a class="dropdown-item personal-dropdown-item" id="logout" style="cursor:pointer">
                                         <div class="d-flex align-items-center">
                                             <div class=""><i class="bi bi-lock-fill"></i></div>
                                             <div class="ms-3"><span>Logout</span></div>
@@ -227,6 +227,22 @@
 
         $('#choose-websites').change(function() {
             localStorage.setItem(currentWebsite, $('#choose-websites').find(":selected").val());
+        })
+
+        $('#logout').click(function() {
+            $.ajax({
+                url: '/login/authentication/logout',
+                type: 'get',
+                success: (result) => {
+                    if (!result.isSuccessful) {
+                        toastr_call('error', 'Error', 'Cannot log out, please try again later');
+                    }
+                    else {
+                        localStorage.clear();
+                        location.reload();
+                    }
+                }
+            })
         })
     </script>
     @await RenderSectionAsync("Script", required: false)

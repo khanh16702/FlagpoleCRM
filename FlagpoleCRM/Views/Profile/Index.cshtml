@@ -1,0 +1,173 @@
+﻿@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<main class="page-content">
+    <div class="row">
+        <div class="col-12 col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="mb-0">My Account</h5>
+                    <hr>
+                    <div class="card shadow-none border">
+                        <div class="card-body">
+                            <form class="row g-3">
+                                <input type="hidden" id="profile-id" value="@TempData["id"]" />
+                                <div class="col-12">
+                                    <label class="form-label">Full name</label>
+                                    <input type="text" class="form-control" value="@TempData["fullName"]" id="profile-full-name">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Phone</label>
+                                    <input type="text" class="form-control" value="@TempData["phone"]" id="profile-phone">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Email address</label>
+                                    <input type="text" class="form-control" value="@TempData["email"]" disabled>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="profile-password">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Confirm password</label>
+                                    <input type="password" class="form-control" id="profile-confirm-password">
+                                </div>
+                                <i class="col-12 mt-2">Leave this field blank if you do not want to change password</i>
+                                <div class="col-6">
+                                    <label class="form-label">Created date</label>
+                                    <input type="datetime" class="form-control" value="@TempData["createdDate"]" disabled>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Time zone</label>
+                                    <select id="profile-timezones" class="form-control"></select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Avatar</label>
+                                    <input type="file" class="form-control" id="upload-avatar">
+                                    <input type="hidden" id="avatar-name" value="@TempData["avatarName"]" />
+                                </div>
+                                <div class="col-md-12 text-center">
+                                    <img src="@TempData["avatar"]" id="avatar-upload" class="rounded mx-auto d-block" style="width: 128px" />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="text-start">
+                        <button type="button" class="btn btn-primary px-4" id="save-profile">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+@section Script {
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: `@Url.Action("GetListTimeZones", "Profile")`,
+                type: 'get',
+                success: (result) => {
+                    $('#profile-timezones').html('');
+                    var attribute = "";
+                    result.forEach((timezone, index) => {
+                        if (timezone.value == '@Html.Raw(TempData["timeZone"])') {
+                            attribute = "selected";
+                        }
+                        else {
+                            attribute = "";
+                        }
+                        $('#profile-timezones').append(`<option value="${timezone.value}" ${attribute}>${timezone.text}</option>`);
+                    })
+                }
+            })
+        })
+
+        $('#upload-avatar').change(function () {
+            let files = $(this).prop('files');
+            let formData = new FormData();
+            formData.append("file", files[0]);
+            formData.append("websiteId", localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE'));
+            $.ajax({
+                url: `@Url.Action("UploadImage", "Profile")`,
+                data: formData,
+                type: 'post',
+                processData: false,
+                contentType: false,
+                success: (result) => {
+                    if (!result.isSuccessful) {
+                        toastr_call('error', 'Error', result.message);
+                    }
+                    else {
+                        $('#avatar-upload').attr('src', result.data.path);
+                        $('#avatar-name').val(result.data.name);
+                        setTimeout(function () {
+                            $.ajax({
+                                url: `@Url.Action("DeleteTempImage", "Profile")?path=${result.data.path}`,
+                                type: 'get'
+                            })
+                        }, 1000);
+                    }
+                }
+            })
+        })
+
+        $('#save-profile').click(function () {
+            var id = $('#profile-id').val();
+            var fullName = $('#profile-full-name').val();
+            var phone = $('#profile-phone').val();
+            var password = $('#profile-password').val();
+            var confirmPassword = $('#profile-confirm-password').val();
+            var timeZone = $('#profile-timezones').find(':selected').val();
+            let files = $('#upload-avatar').prop('files');
+
+            if ((password || confirmPassword) && password != confirmPassword) {
+                toastr_call('error', 'Error', 'Password and confirmed password must be the same');
+            }
+            else {
+                let formData = new FormData();
+                formData.append("file", files[0]);
+                formData.append("accountId", id);
+                $.ajax({
+                    url: `@Url.Action("AddAvatar", "Profile")`,
+                    type: 'post',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: (result) => {
+                        if (!result.isSuccessful) {
+                            toastr_call('error', 'Error', 'Some errors occurred');
+                        }
+                        else {
+                            $.ajax({
+                                url: `@Url.Action("UpdateAccount","Profile")`,
+                                type: 'post',
+                                data: {
+                                    Id: id,
+                                    Username: fullName,
+                                    PhoneNumber: phone,
+                                    Password: password,
+                                    RetypedPassword: confirmPassword,
+                                    Timezone: timeZone,
+                                    Avatar: result.data.path
+                                },
+                                success: (result) => {
+                                    if (!result.isSuccessful) {
+                                        toastr_call('error', 'Error', result.message);
+                                    }
+                                    else {
+                                        toastr_call('success', 'Success', 'Update account successfully!');
+                                        setTimeout(function () {
+                                            location.reload();
+                                        }, 1000);
+                                    }
+                                }
+                            })
+                        }
+                    }
+                })
+            }
+        })
+    </script>
+}

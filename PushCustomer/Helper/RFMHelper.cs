@@ -13,7 +13,7 @@ namespace PushCustomers.Helper
         {
             try
             {
-                _logger.LogInformation($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Calculating RFM quintiles");
+                _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Calculating RFM quintiles");
 
                 var customers = _mongoDbCustomer.Find(x => x.RFM != null).Result.ToList();
 
@@ -28,7 +28,7 @@ namespace PushCustomers.Helper
 
                 foreach (Customer customer in customers)
                 {
-                    _logger.LogInformation($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Calculating RFM of customer {customer.Id}");
+                    _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Calculating RFM of customer {customer.Id}");
                     customer.RFM.RScore = CalculateRFMScore(customer.RFM.RValue, rvalQuintile);
                     customer.RFM.FScore = CalculateRFMScore(customer.RFM.FValue, fvalQuintile);
                     customer.RFM.MScore = CalculateRFMScore(customer.RFM.MValue, mvalQuintile);
@@ -37,21 +37,21 @@ namespace PushCustomers.Helper
                     customer.ModifiedDate = DateTime.Now;
                     _mongoDbCustomer.Update(customer.Id, customer);
 
-                    _logger.LogInformation($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Pushing to Elasticsearch customer {customer.Id}");
+                    _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Pushing to Elasticsearch customer {customer.Id}");
                     PushToElastic.PushCustomer(customer, _logger, client);
                 }
 
                 var restCustomers = _mongoDbCustomer.Find(x => x.RFM == null).Result.ToList();
                 foreach(Customer restCustomer in restCustomers)
                 {
-                    _logger.LogInformation($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Pushing to Elasticsearch customer {restCustomer.Id}");
+                    _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Pushing to Elasticsearch customer {restCustomer.Id}");
                     PushToElastic.PushCustomer(restCustomer, _logger, client);
                 }
-                _logger.LogInformation($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Done push customers to Elasticsearch");
+                _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Done push customers to Elasticsearch");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Error while calculating RFM: {ex.Message}");
+                _logger.LogError($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Error while calculating RFM: {ex.Message}");
             }
         }
 

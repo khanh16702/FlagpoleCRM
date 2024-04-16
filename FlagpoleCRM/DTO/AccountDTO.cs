@@ -7,5 +7,7 @@ namespace FlagpoleCRM.DTO
     {
         public string? RetypedPassword { get; set; }
         public string Password { get; set; }
+        public string? Timezone { get; set; }
+        public string? Avatar { get; set; }
     }
 }

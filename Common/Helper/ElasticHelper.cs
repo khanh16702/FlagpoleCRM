@@ -172,6 +172,7 @@ namespace Common.Helper
         /// </summary>
         public static ElasticSearchResult SearchAfterElastic(
             ref ElasticSearchAfter elasticQuery, 
+            string indexName,
             RestClient client,
             ref long lastShardDoc, 
             bool isFirstLoad = false)
@@ -182,7 +183,7 @@ namespace Common.Helper
             if (isFirstLoad)
             {
                 // Tạo pit mới
-                var createPit = GeneratePit(client, "15m");   // keep_alive = 15 minutes
+                var createPit = GeneratePit(indexName, client, "1m");   // keep_alive = 1 minute
                 var error = createPit.GetType().GetProperty("Error");
                 if (error != null)
                 {
@@ -273,9 +274,9 @@ namespace Common.Helper
         /// <param name="elasticUrl"></param>
         /// <param name="keepAlive"></param>
         /// <returns></returns>
-        public static object GeneratePit(RestClient client, string keepAlive)
+        public static object GeneratePit(string indexName, RestClient client, string keepAlive)
         {
-            var request = new RestRequest($"/cdp.customer/_pit?keep_alive={keepAlive}", Method.Post);
+            var request = new RestRequest($"/{indexName}/_pit?keep_alive={keepAlive}", Method.Post);
             var response = client.Execute(request);
             if (!response.IsSuccessful)
             {

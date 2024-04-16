@@ -9,41 +9,45 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = FlagpoleCRM
 build_property.RootNamespace = FlagpoleCRM
-build_property.ProjectDir = D:\visualstudio-code\DoAnTotNghiep\FinalMainProject\FlagpoleCRM\FlagpoleCRM\
+build_property.ProjectDir = D:\GitHubCode\FlagpoleCRM\FlagpoleCRM\
 build_property.RazorLangVersion = 6.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = D:\visualstudio-code\DoAnTotNghiep\FinalMainProject\FlagpoleCRM\FlagpoleCRM
+build_property.MSBuildProjectDirectory = D:\GitHubCode\FlagpoleCRM\FlagpoleCRM
 build_property._RazorSourceGeneratorDebug = 
 
-[D:/visualstudio-code/DoAnTotNghiep/FinalMainProject/FlagpoleCRM/FlagpoleCRM/Areas/Login/Views/Authentication/Index.cshtml]
+[D:/GitHubCode/FlagpoleCRM/FlagpoleCRM/Areas/Login/Views/Authentication/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcTG9naW5cVmlld3NcQXV0aGVudGljYXRpb25cSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/visualstudio-code/DoAnTotNghiep/FinalMainProject/FlagpoleCRM/FlagpoleCRM/Views/Campaign/Index.cshtml]
+[D:/GitHubCode/FlagpoleCRM/FlagpoleCRM/Views/Campaign/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FtcGFpZ25cSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/visualstudio-code/DoAnTotNghiep/FinalMainProject/FlagpoleCRM/FlagpoleCRM/Views/Customer/Index.cshtml]
+[D:/GitHubCode/FlagpoleCRM/FlagpoleCRM/Views/Customer/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VzdG9tZXJcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/visualstudio-code/DoAnTotNghiep/FinalMainProject/FlagpoleCRM/FlagpoleCRM/Views/DataSynchronization/Index.cshtml]
+[D:/GitHubCode/FlagpoleCRM/FlagpoleCRM/Views/DataSynchronization/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGF0YVN5bmNocm9uaXphdGlvblxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/visualstudio-code/DoAnTotNghiep/FinalMainProject/FlagpoleCRM/FlagpoleCRM/Views/Home/Index.cshtml]
+[D:/GitHubCode/FlagpoleCRM/FlagpoleCRM/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/visualstudio-code/DoAnTotNghiep/FinalMainProject/FlagpoleCRM/FlagpoleCRM/Views/Shared/_CustomerSaveAudience.cshtml]
+[D:/GitHubCode/FlagpoleCRM/FlagpoleCRM/Views/Profile/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZmlsZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/GitHubCode/FlagpoleCRM/FlagpoleCRM/Views/Shared/_CustomerSaveAudience.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9DdXN0b21lclNhdmVBdWRpZW5jZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/visualstudio-code/DoAnTotNghiep/FinalMainProject/FlagpoleCRM/FlagpoleCRM/Views/Website/Index.cshtml]
+[D:/GitHubCode/FlagpoleCRM/FlagpoleCRM/Views/Website/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcV2Vic2l0ZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/visualstudio-code/DoAnTotNghiep/FinalMainProject/FlagpoleCRM/FlagpoleCRM/Views/Shared/_Layout.cshtml]
+[D:/GitHubCode/FlagpoleCRM/FlagpoleCRM/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-4l9e4qj1pz

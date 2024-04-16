@@ -32,6 +32,8 @@
     <Folder Include="wwwroot\assets\plugins\nicescroll\css\" />
     <Folder Include="wwwroot\assets\plugins\queryBuilder\css\" />
     <Folder Include="wwwroot\assets\plugins\queryBuilder\js\" />
+    <Folder Include="wwwroot\img\temp\" />
+    <Folder Include="wwwroot\img\user\avatar\" />
   </ItemGroup>
 
   <ItemGroup>

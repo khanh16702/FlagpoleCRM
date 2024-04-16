@@ -27,7 +27,7 @@ namespace PushCustomers.Utilize
             }
             if (!pushElasticResponse.IsSuccessful)
             {
-                _logger.LogError($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Error while pushing to Elastic: {pushElasticResponse.Message}");
+                _logger.LogError($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Error while pushing to Elastic: {pushElasticResponse.Message}");
             }
         }
     }

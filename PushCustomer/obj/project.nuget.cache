@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "PCeRQNLxM1MOT5LQlzps1oPWk3OhH8LIOB65jOrDlMh1g1DZrIfTUzfFCNY5EoFXYEUguwXZHhnvlps4TFgmJw==",
+  "dgSpecHash": "fxRdLS5mWlMGmAeO9ZW2mUKWDVtiZGJybZUcKG3Wnt/eUpXh5kJIJ1zZm42hPFHkHSXH5DtzBlDGTBcrXa/3pA==",
   "success": true,
-  "projectFilePath": "D:\\visualstudio-code\\DoAnTotNghiep\\FinalMainProject\\FlagpoleCRM\\PushCustomer\\PushCustomers.csproj",
+  "projectFilePath": "D:\\GitHubCode\\FlagpoleCRM\\PushCustomer\\PushCustomers.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\admin\\.nuget\\packages\\awssdk.core\\3.7.100.14\\awssdk.core.3.7.100.14.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\awssdk.securitytoken\\3.7.100.14\\awssdk.securitytoken.3.7.100.14.nupkg.sha512",

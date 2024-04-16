@@ -31,7 +31,7 @@ namespace SyncData
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Start sync data from ecommerce");
+                _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Start sync data from ecommerce");
                 timer.Start();
                 using (var scope = _scopeFactory.CreateScope())
                 {
@@ -52,10 +52,11 @@ namespace SyncData
                     //}
                 }
                 timer.Stop();
-                _logger.LogInformation($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Sync data done in {timer.Elapsed.ToString(@"hh\:mm\:ss\.ffff")}");
+                _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Sync data done in {timer.Elapsed.ToString(@"hh\:mm\:ss\.ffff")}");
+                timer.Reset();
                 await Task.Delay(21600000, stoppingToken);
             }
-            _logger.LogInformation($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Stop sync data from ecommerce");
+            _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Stop sync data from ecommerce");
         }
 
         private void SyncData(Website website, 
@@ -68,7 +69,7 @@ namespace SyncData
 
             if (!string.IsNullOrEmpty(website.ShopifyStore) && !string.IsNullOrEmpty(website.ShopifyToken))
             {
-                _logger.LogInformation($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Sync data from Shopify");
+                _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Sync data from Shopify");
 
                 while (!isStop)
                 {
@@ -97,7 +98,7 @@ namespace SyncData
 
                 isStop = false;
                 int page = 1;
-                _logger.LogInformation($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Sync data from Haravan");
+                _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Sync data from Haravan");
                 while (!isStop)
                 {
                     var response = AccessHaravan(website, collection, page);
@@ -129,7 +130,7 @@ namespace SyncData
         {
             try
             {
-                _logger.LogInformation($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Process orders from WebsiteId {website.Guid}");
+                _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Process orders from WebsiteId {website.Guid}");
                 var orders = JsonConvert.DeserializeObject<OrderResult>(response.Content).Orders;
 
                 if (orders.Count == 0)
@@ -145,7 +146,7 @@ namespace SyncData
                     {
                         sinceId = order.OrgId;
                     }
-                    _logger.LogInformation($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Process order {order.OrgId} from {source}");
+                    _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Process order {order.OrgId} from {source}");
                     var matchOrder = _mongoOrder.Find(x => x.OrgId == order.OrgId
                         && x.OrgSrc == source
                         && x.WebsiteId == website.Guid.Replace("-",""))
@@ -177,7 +178,7 @@ namespace SyncData
         {
             try
             {
-                _logger.LogInformation($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Process customers from WebsiteId {website.Guid}");
+                _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Process customers from WebsiteId {website.Guid}");
                 var customers = JsonConvert.DeserializeObject<CustomerResult>(response.Content).Customers;
 
                 if (customers.Count == 0)
@@ -193,7 +194,7 @@ namespace SyncData
                     {
                         sinceId = customer.Id;
                     }
-                    _logger.LogInformation($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Process customer {customer.Id} from {source}");
+                    _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Process customer {customer.Id} from {source}");
                     var matchCustomer = _mongoCustomerRaw.Find(x => x.Id == customer.Id
                         && x.WebsiteId == website.Guid.Replace("-","")
                         && x.OrgSrc == source)

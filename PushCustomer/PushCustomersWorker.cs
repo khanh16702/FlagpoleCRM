@@ -6,6 +6,8 @@ using RestSharp.Authenticators;
 using RestSharp;
 using System.Diagnostics;
 using PushCustomers.Helper;
+using FlagpoleCRM.Models;
+using FlagpoleCRM.DTO;
 
 namespace PushCustomers
 {
@@ -13,11 +15,13 @@ namespace PushCustomers
     {
         private readonly ILogger<PushCustomersWorker> _logger;
         private readonly IConfiguration _configuration;
+        private readonly IServiceScopeFactory _scopeFactory;
 
-        public PushCustomersWorker(ILogger<PushCustomersWorker> logger, IConfiguration configuration)
+        public PushCustomersWorker(ILogger<PushCustomersWorker> logger, IConfiguration configuration, IServiceScopeFactory scopeFactory)
         {
             _logger = logger;
             _configuration = configuration;
+            _scopeFactory = scopeFactory;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -29,17 +33,18 @@ namespace PushCustomers
             while (!stoppingToken.IsCancellationRequested)
             {
                 timer.Start();
-                _logger.LogInformation($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Start push customers");
+                _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Start push customers");
                 var options = new RestClientOptions(_configuration["Elasticsearch:Connection"]);
                 options.Authenticator = new HttpBasicAuthenticator(_configuration["Elasticsearch:Username"], _configuration["Elasticsearch:Password"]);
                 var client = new RestClient(options);
 
+                bool isRescanAudience = false;  // if Customer index of Elasticsearch changed, Audience table in SQLServer must be rescanned
                 if (_mongoCustomerRaw.CountDocumentsAsync().Result > 0)
                 {
                     var customers = _mongoCustomerRaw.Find(x => x.IsSyncCustomer == false).Result.ToList();
                     foreach (CustomerRaw customer in customers)
                     {
-                        _logger.LogInformation($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Push customer {customer.Id}");
+                        _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Push customer {customer.Id}");
                         var matchedCustomer =
                             _mongoCustomer.Find(x => x.Contacts.Any(x => (!string.IsNullOrEmpty(x.Email) && x.Email == customer.Email)
                             || (!string.IsNullOrEmpty(x.Phone) && x.Phone == customer.Phone)
@@ -51,7 +56,7 @@ namespace PushCustomers
                             var response = SyncCustomerService.UpdateCustomer(matchedCustomer, customer, _mongoCustomer);
                             if (!response.IsSuccessful)
                             {
-                                _logger.LogError($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Error while pushing customer {customer.Id}: {response.Message}");
+                                _logger.LogError($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Error while pushing customer {customer.Id}: {response.Message}");
                             }
                             else
                             {
@@ -64,7 +69,7 @@ namespace PushCustomers
                             var response = SyncCustomerService.InsertCustomer(customer, _mongoCustomer);
                             if (!response.IsSuccessful)
                             {
-                                _logger.LogError($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Error while pushing customer {customer.Id}: {response.Message}");
+                                _logger.LogError($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Error while pushing customer {customer.Id}: {response.Message}");
                             }
                             else
                             {
@@ -77,16 +82,46 @@ namespace PushCustomers
                     // Calculate RFM and push to Elasticsearch
                     if (customers.Any())
                     {
-                        _logger.LogInformation($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Start calculate RFM");
+                        isRescanAudience = true;
+                        _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Start calculate RFM");
                         RFMHelper.CalculateRFM(_mongoCustomer, _logger, client);
                     }
                 }
 
                 timer.Stop();
-                _logger.LogInformation($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Finish push customers in {timer.Elapsed.ToString(@"hh\:mm\:ss\.ffff")}");
+                _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Finish push customers in {timer.Elapsed.ToString(@"hh\:mm\:ss\.ffff")}");
+                
+                if (isRescanAudience)
+                {
+                    _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Start modify static audiences");
+                    using (var scope = _scopeFactory.CreateScope())
+                    {
+                        var customerService = scope.ServiceProvider.GetRequiredService<ICustomerService>();
+                        timer.Restart();
+                        _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Getting static audiences...");
+                        var audiences = customerService.GetDynamicAudiences();
+                        Parallel.ForEach(audiences, new ParallelOptions { MaxDegreeOfParallelism = 3 }, audience =>
+                        {
+                            _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Start modify audience {audience.Id}");
+                            if (!audience.IsHasModification)
+                            {
+                                audience.IsHasModification = true;
+                                var audienceDTO = new AudienceDTO(audience);
+                                var updateAudienceResponse = customerService.InsertAudience(audienceDTO);
+                                if (!updateAudienceResponse.IsSuccessful)
+                                {
+                                    _logger.LogError($"Modify audience failed at AudienceID: {audience.Id}: {updateAudienceResponse.Message}");
+                                }
+                            }
+                        });
+                        timer.Stop();
+                        _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Finish modify static audiences in {timer.Elapsed.ToString(@"hh\:mm\:ss\.ffff")}");
+                    }
+                }
+                timer.Reset();
                 await Task.Delay(30000, stoppingToken);
             }
-            _logger.LogInformation($"{DateTime.Now.ToString("dd/mm/yyyy hh:mm:ss")}: Stop push customers");
+            _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Stop push customers");
         }
 
     }

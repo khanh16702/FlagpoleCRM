@@ -51,7 +51,7 @@ namespace Common.Models
                 new Dictionary<string, object>()
                 {
                     {
-                        "OrgCreatedAt", new {
+                        "OrgCreatedDate", new {
                             order = "asc"
                         }
                     }

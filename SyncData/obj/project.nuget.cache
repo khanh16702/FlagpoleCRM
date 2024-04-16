@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "mBj70vUUkMdhZe2n61dzCAD09LrCY1J0QjGLS28i9KYJCDJT/mOgx8esCczWt4T6qJhwdx7zQt2sy4yauFrfIg==",
+  "dgSpecHash": "k1Khpn0+QalCmB4XsCdcwgnGBW5Hk+NQ6Z3W6azG1Axh7PoetffUcYYAwiBhw28W/RfYr/1cVFD60QS+yP6WrQ==",
   "success": true,
-  "projectFilePath": "D:\\visualstudio-code\\DoAnTotNghiep\\FinalMainProject\\FlagpoleCRM\\SyncData\\SyncData.csproj",
+  "projectFilePath": "D:\\GitHubCode\\FlagpoleCRM\\SyncData\\SyncData.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\admin\\.nuget\\packages\\awssdk.core\\3.7.100.14\\awssdk.core.3.7.100.14.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\awssdk.securitytoken\\3.7.100.14\\awssdk.securitytoken.3.7.100.14.nupkg.sha512",

@@ -260,14 +260,23 @@
         function loadCustomers(limit) {
             var condition;
             var rulesQueryBuilder;
+            var rulesObj;
+
             try {
                 condition = $('#filter-builder').queryBuilder('getSQL', false);
-                rulesQueryBuilder = JSON.stringify($('#filter-builder').queryBuilder('getRules'));
+                rulesObj = $('#filter-builder').queryBuilder('getRules');
+                if (rulesObj == null) {
+                    rulesQueryBuilder = '';
+                }
+                else {
+                    rulesQueryBuilder = JSON.stringify(rulesObj);
+                }
             }
             catch {
                 condition = '';
                 rulesQueryBuilder = '';
             }
+            
             customerTable = $('#customer-list').DataTable({
                 dom: "<'.row ml-0 fs-md'>" +
                     "<'row'<'col-sm-12 'tr>>" +
@@ -286,9 +295,11 @@
                         }
                         else {
                             model.condition = condition.sql;
-                        }
+                        } 
+
                         model.email = '@TempData["email"]';
                         model.websiteId = localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE');
+                        model.rules = rulesQueryBuilder;
                         if (model.order[0].column === 0) {
                             if (limit > 0) {
                                 model.limit = limit;
@@ -306,9 +317,9 @@
                     $('#total-leads').html(record.recordsTotal);
                     $('#matching-leads').html(record.recordsFiltered);
                     $('#matching-ratio').html(record.ratio);
-                    localStorage.setItem('@Common.Constant.CookiesName.ELASTIC_QUERY', record.jsonElasticQuery);
+                    localStorage.setItem('@Common.Constant.CookiesName.ELASTIC_QUERY', record.strElasticQuery);
                     localStorage.setItem('@Common.Constant.CookiesName.SQL_QUERY', record.sqlQuery);
-                    localStorage.setItem('@Common.Constant.CookiesName.RULES_QUERY', rulesQueryBuilder);
+                    localStorage.setItem('@Common.Constant.CookiesName.RULES_QUERY', record.strRulesQueryBuilder);
                 },
                 columns: getColumns(),
                 bDestroy: true
@@ -574,6 +585,10 @@
             loadCustomers(0);
         }
         $('#reset-query').click(function () {
+            setAudienceDetail("0", "", "", 1, 0);
+            if (audienceId == 0) {
+                loadSaveAudiencePopup();
+            }
             resetQuery();
         });
 

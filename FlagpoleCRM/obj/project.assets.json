@@ -12575,11 +12575,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\visualstudio-code\\DoAnTotNghiep\\FinalMainProject\\FlagpoleCRM\\FlagpoleCRM\\FlagpoleCRM.csproj",
+      "projectUniqueName": "D:\\GitHubCode\\FlagpoleCRM\\FlagpoleCRM\\FlagpoleCRM.csproj",
       "projectName": "FlagpoleCRM",
-      "projectPath": "D:\\visualstudio-code\\DoAnTotNghiep\\FinalMainProject\\FlagpoleCRM\\FlagpoleCRM\\FlagpoleCRM.csproj",
+      "projectPath": "D:\\GitHubCode\\FlagpoleCRM\\FlagpoleCRM\\FlagpoleCRM.csproj",
       "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-      "outputPath": "D:\\visualstudio-code\\DoAnTotNghiep\\FinalMainProject\\FlagpoleCRM\\FlagpoleCRM\\obj\\",
+      "outputPath": "D:\\GitHubCode\\FlagpoleCRM\\FlagpoleCRM\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
@@ -12602,8 +12602,8 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "D:\\visualstudio-code\\DoAnTotNghiep\\FinalMainProject\\FlagpoleCRM\\Common\\Common.csproj": {
-              "projectPath": "D:\\visualstudio-code\\DoAnTotNghiep\\FinalMainProject\\FlagpoleCRM\\Common\\Common.csproj"
+            "D:\\GitHubCode\\FlagpoleCRM\\Common\\Common.csproj": {
+              "projectPath": "D:\\GitHubCode\\FlagpoleCRM\\Common\\Common.csproj"
             }
           }
         }

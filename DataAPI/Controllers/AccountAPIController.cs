@@ -28,5 +28,19 @@ namespace DataAPI.Controllers
         {
             return _accountService.GetAccountByEmail(email);
         }
+
+        [Route("GetAccountById")]
+        [HttpGet]
+        public Account GetAccountById(string id)
+        {
+            return _accountService.GetAccountById(id);
+        }
+
+        [Route("UpdateAccount")]
+        [HttpPost]
+        public ResponseModel UpdateAccount(Account account)
+        {
+            return _accountService.Update(account);
+        }
     }
 }

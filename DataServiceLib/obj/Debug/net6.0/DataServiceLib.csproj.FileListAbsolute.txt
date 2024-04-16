@@ -21,3 +21,49 @@ D:\visualstudio-code\DoAnTotNghiep\FinalMainProject\FlagpoleCRM\DataServiceLib\o
 D:\visualstudio-code\DoAnTotNghiep\FinalMainProject\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\refint\DataServiceLib.dll
 D:\visualstudio-code\DoAnTotNghiep\FinalMainProject\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\DataServiceLib.pdb
 D:\visualstudio-code\DoAnTotNghiep\FinalMainProject\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\ref\DataServiceLib.dll
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\appsettings.Development.json
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\appsettings.json
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\FlagpoleCRM.deps.json
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\FlagpoleCRM.runtimeconfig.json
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\FlagpoleCRM.staticwebassets.runtime.json
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\FlagpoleCRM.exe
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\DataServiceLib.deps.json
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\DataServiceLib.dll
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\DataServiceLib.pdb
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\Common.dll
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\FlagpoleCRM.dll
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\Common.pdb
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\FlagpoleCRM.pdb
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\DataServiceLib.csproj.AssemblyReference.cache
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\DataServiceLib.GeneratedMSBuildEditorConfig.editorconfig
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\DataServiceLib.AssemblyInfoInputs.cache
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\DataServiceLib.AssemblyInfo.cs
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\DataServiceLib.csproj.CoreCompileInputs.cache
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\DataServiceLib.csproj.CopyComplete
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\DataServiceLib.dll
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\refint\DataServiceLib.dll
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\DataServiceLib.pdb
+D:\Git Hub Code\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\ref\DataServiceLib.dll
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\appsettings.Development.json
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\appsettings.json
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\FlagpoleCRM.deps.json
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\FlagpoleCRM.runtimeconfig.json
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\FlagpoleCRM.staticwebassets.runtime.json
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\FlagpoleCRM.exe
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\DataServiceLib.deps.json
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\DataServiceLib.dll
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\DataServiceLib.pdb
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\Common.dll
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\FlagpoleCRM.dll
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\Common.pdb
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\FlagpoleCRM.pdb
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\DataServiceLib.csproj.AssemblyReference.cache
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\DataServiceLib.GeneratedMSBuildEditorConfig.editorconfig
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\DataServiceLib.AssemblyInfoInputs.cache
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\DataServiceLib.AssemblyInfo.cs
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\DataServiceLib.csproj.CoreCompileInputs.cache
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\DataServiceLib.csproj.CopyComplete
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\DataServiceLib.dll
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\refint\DataServiceLib.dll
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\DataServiceLib.pdb
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\ref\DataServiceLib.dll

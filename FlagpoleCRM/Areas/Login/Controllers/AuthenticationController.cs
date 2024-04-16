@@ -38,7 +38,6 @@ namespace FlagpoleCRM.Areas.Login.Controllers
             return Json(_configuration.GetSection("WebUrl").Value);
         }
 
-        [HttpPost]
         public async Task<ResponseModel> Login(AccountDTO model)
         {
             if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password)) {
@@ -62,7 +61,29 @@ namespace FlagpoleCRM.Areas.Login.Controllers
             return (ResponseModel)response;
         }
 
-        [HttpPost]
+        public ResponseModel Logout()
+        {
+            var response = new ResponseModel { IsSuccessful = true };
+            try
+            {
+                if (HttpContext.Request.Cookies.ContainsKey(CookiesName.JWT_COOKIE))
+                {
+                    Response.Cookies.Delete(CookiesName.JWT_COOKIE);
+                }
+                else
+                {
+                    throw new Exception("JWT does not exist");
+                }
+            }
+            catch(Exception ex)
+            {
+                response.IsSuccessful = false;
+                response.Message = ex.Message;
+                _log.Error($"Log out failed: {ex.Message}");
+            }
+            return response;
+        }
+
         public async Task<ResponseModel> Register(AccountDTO model)
         {
             if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password) || string.IsNullOrEmpty(model.RetypedPassword))
@@ -97,7 +118,6 @@ namespace FlagpoleCRM.Areas.Login.Controllers
 
         }
 
-        [HttpPost]
         public async Task<ResponseModel> ConfirmOTP(ConfirmEmailDTO model)
         {
             if (string.IsNullOrEmpty(model.Email))
@@ -127,7 +147,6 @@ namespace FlagpoleCRM.Areas.Login.Controllers
             return (ResponseModel)response;
         }
 
-        [HttpPost]
         public async Task<ResponseModel> CreateToken(string email)
         {
             try

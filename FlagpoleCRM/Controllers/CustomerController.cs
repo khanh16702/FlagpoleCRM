@@ -1,5 +1,6 @@
 ﻿using Castle.DynamicLinqQueryBuilder;
 using Common.Constant;
+using Common.Extension;
 using Common.Helper;
 using Common.Models;
 using FlagpoleCRM.DTO;
@@ -8,6 +9,7 @@ using FlagpoleCRM.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 using RestSharp.Authenticators;
 using System;
@@ -89,8 +91,9 @@ namespace FlagpoleCRM.Controllers
             var sort = new List<Dictionary<string, object>>();
             var totalMatchingLeads = 0;
             var ratio = "";
-            var jsonElasticQuery = "";
+            var strElasticQuery = "";
             var sqlQuery = "";
+            var strRulesQueryBuilder = "";
 
             try
             {
@@ -110,10 +113,6 @@ namespace FlagpoleCRM.Controllers
 
                     var currentAcc = JsonConvert.DeserializeObject<Account>(JsonConvert.SerializeObject(findAcc));
                     var timezone = currentAcc.Timezone;
-                    var offsetType = timezone[0] == '+' ? 1 : -1;
-                    var offsetTime = timezone.Substring(1);
-                    var offsetHour = int.Parse(offsetTime.Split(":")[0]);
-                    var offsetMinute = int.Parse(offsetTime.Split(":")[1]);
 
                     var sortItem = new Dictionary<string, object>();
                     sortItem.Add(model.orderColumnName, model.order[0].dir);
@@ -123,8 +122,17 @@ namespace FlagpoleCRM.Controllers
                     var error = buildedQuery.GetType().GetProperty("Error");
                     if (error == null)
                     {
+                        if (!string.IsNullOrEmpty(model.Rules))
+                        {
+                            var rulesObj = JObject.Parse(model.Rules);
+                            if (model.Limit > 0)
+                            {
+                                rulesObj.Add("limit", model.Limit);
+                            }
+                            strRulesQueryBuilder = JsonConvert.SerializeObject(rulesObj);
+                        }
                         var elasticQuery = ElasticHelper.GetElasticQuery(buildedQuery);
-                        jsonElasticQuery = JsonConvert.SerializeObject(elasticQuery);
+                        strElasticQuery = JsonConvert.SerializeObject(elasticQuery);
                         sqlQuery = ElasticHelper.GetSqlQuery(buildedQuery);
 
                         totalMatchingLeads = model.Limit > 0 
@@ -174,10 +182,9 @@ namespace FlagpoleCRM.Controllers
                                 };
                                 respItem.Source.ChannelSubscribes = respItem.Source.ChannelSubscribes ?? new List<int>();
                                 respItem.Source.Tags = respItem.Source.Tags ?? new List<string>();
-                                respItem.Source.OrgCreatedDate = respItem.Source.OrgCreatedDate.AddHours(offsetType * offsetHour).AddMinutes(offsetType * offsetMinute);
+                                respItem.Source.OrgCreatedDate = respItem.Source.OrgCreatedDate.GetTimeWithOffset(timezone);
                                 lst.Add(respItem);
                             }
-
                         }
                     }
                     else
@@ -200,7 +207,8 @@ namespace FlagpoleCRM.Controllers
                 recordsTotal = _totalLeads, 
                 recordsFiltered = totalMatchingLeads, 
                 ratio, 
-                jsonElasticQuery, 
+                strElasticQuery,
+                strRulesQueryBuilder,
                 sqlQuery 
             });
         }
@@ -266,6 +274,7 @@ namespace FlagpoleCRM.Controllers
                     return response;
                 }
             }
+            model.IsHasModification = true;
             response = (ResponseModel)await APIHelper.PostTemplateAsync(model, "/api/CustomerAPI/InsertAudience", _apiUrl, _superHeaderName, _superHeaderValue);
             if (!response.IsSuccessful)
             {

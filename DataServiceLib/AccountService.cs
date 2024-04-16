@@ -40,7 +40,7 @@ namespace DataServiceLib
                     Password = EncodeAction.Hash(model.Password, salt),
                     FullName = RandomGenerating.RandomString(8),
                     Avatar = "/img/default-avatar/UserDefault.png",
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = DateTime.UtcNow,
                     EmailConfirmed = false,
                     PhoneNumberConfirmed = false,
                     IsDeleted = false,
@@ -91,14 +91,17 @@ namespace DataServiceLib
                 {
                     return new ResponseModel() { IsSuccessful = false, Message = "Cannot find matching account" };
                 }
-                account.Avatar = model.Avatar ?? account.Avatar;
-                account.Password = model.Password != account.Password ? EncodeAction.Hash(model.Password, account.Salt) : account.Password;
+                account.Avatar = string.IsNullOrEmpty(model.Avatar) ? account.Avatar : model.Avatar;
+                if (!string.IsNullOrWhiteSpace(model.Password))
+                {
+                    account.Password = model.Password != account.Password ? EncodeAction.Hash(model.Password, account.Salt) : account.Password;
+                }
                 account.FullName = model.FullName ?? account.FullName;
                 account.Timezone = model.Timezone ?? account.Timezone;
                 account.IsDeleted = model.IsDeleted != account.IsDeleted ? model.IsDeleted : account.IsDeleted;
                 account.EmailConfirmed = model.EmailConfirmed != account.EmailConfirmed ? model.EmailConfirmed : account.EmailConfirmed;
                 account.PhoneNumberConfirmed = model.PhoneNumberConfirmed != account.PhoneNumberConfirmed ? model.PhoneNumberConfirmed : account.PhoneNumberConfirmed;
-                account.PhoneNumber = model.PhoneNumber;
+                account.PhoneNumber = model.PhoneNumber ?? account.PhoneNumber;
 
                 _flagpoleCRM.Accounts.Update(account);
                 _flagpoleCRM.SaveChanges();

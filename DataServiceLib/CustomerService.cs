@@ -10,9 +10,14 @@ namespace DataServiceLib
     {
         ResponseModel InsertAudience(AudienceDTO model);
         List<Audience> GetAudiences(string websiteId);
+        List<Audience> GetDynamicAudiences();
         Audience GetAudienceByName(string name, string websiteId);
-
         ResponseModel DeleteAudience(string id);
+        List<AudienceCustomer> GetAudienceCustomersByAudienceId(string audienceId);
+        AudienceCustomer FindAudienceCustomer(string audienceId, string customerId);
+        ResponseModel InsertAudienceCustomer(string audienceId, string customerId);
+        ResponseModel UpdateAudienceCustomer(AudienceCustomer model);
+
     }
     public class CustomerService : ICustomerService
     {
@@ -55,9 +60,9 @@ namespace DataServiceLib
                     var audience = _flagpoleCRM.Audiences.FirstOrDefault(x => x.Id == model.Id);
                     audience.Name = model.Name;
                     audience.Description = model.Description;
-                    audience.IsHasModification = true;
+                    audience.IsHasModification = model.IsHasModification;
                     audience.ModifiedDate = DateTime.Now;
-                    audience.IsDynamic = model.IsDynamic;
+                    audience.IsDynamic = model.Type == 1 ? true : false;
                     audience.Sqlquery = model.Sqlquery;
                     audience.ElasticQuery = model.ElasticQuery;
                     audience.RulesQueryBuilder = model.RulesQueryBuilder;
@@ -81,6 +86,11 @@ namespace DataServiceLib
             return _flagpoleCRM.Audiences.Where(x => x.WebsiteId == websiteId && !x.IsDeleted).ToList();
         }
 
+        public List<Audience> GetDynamicAudiences()
+        {
+            return _flagpoleCRM.Audiences.Where(x => x.IsDynamic && !x.IsDeleted).ToList();
+        }
+
         public Audience GetAudienceByName(string name, string websiteId)
         {
             return _flagpoleCRM.Audiences.FirstOrDefault(x => x.Name == name && x.WebsiteId == websiteId && !x.IsDeleted);
@@ -102,6 +112,67 @@ namespace DataServiceLib
                 response.Message = ex.Message;
             }
             return response;
+        }
+
+        public AudienceCustomer FindAudienceCustomer(string audienceId, string customerId)
+        {
+            return _flagpoleCRM.AudienceCustomers.FirstOrDefault(x =>
+            x.AudienceId == audienceId && x.CustomerId == customerId);
+        }
+
+        public ResponseModel InsertAudienceCustomer(string audienceId, string customerId)
+        {
+            var response = new ResponseModel { IsSuccessful = true };
+            try
+            {
+                var audienceCustomer = new AudienceCustomer
+                {
+                    AudienceId = audienceId,
+                    CustomerId = customerId,
+                    CreatedDate = DateTime.Now,
+                    ModifiedDate = DateTime.Now,
+                    IsDeleted = false
+                };
+                _flagpoleCRM.AudienceCustomers.Add(audienceCustomer);
+                _flagpoleCRM.SaveChanges();
+            }
+            catch(Exception ex)
+            {
+                response.IsSuccessful = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public ResponseModel UpdateAudienceCustomer(AudienceCustomer model)
+        {
+            var response = new ResponseModel { IsSuccessful = true };
+            try
+            {
+                var audienceCustomer = _flagpoleCRM.AudienceCustomers.FirstOrDefault(x => x.Id == model.Id);
+                if (audienceCustomer == null)
+                {
+                    throw new Exception("AudienceCustomer not found");
+                }
+                else
+                {
+                    audienceCustomer.ModifiedDate = DateTime.Now;
+                    audienceCustomer.IsDeleted = model.IsDeleted;
+                    _flagpoleCRM.AudienceCustomers.Update(audienceCustomer);
+                    _flagpoleCRM.SaveChanges();
+                }
+            }
+            catch(Exception ex)
+            {
+                response.IsSuccessful = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public List<AudienceCustomer> GetAudienceCustomersByAudienceId(string audienceId)
+        {
+            return _flagpoleCRM.AudienceCustomers.Where(x => x.AudienceId == audienceId).ToList();
         }
     }
 }

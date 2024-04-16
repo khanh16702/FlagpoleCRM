@@ -14,6 +14,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddScoped<DbContext, FlagpoleCRMContext>();
         services.AddSingleton<ILog>(_ => LogManager.GetLogger(typeof(WebsiteService)));
         services.AddTransient<IWebsiteService, WebsiteService>();
+        services.AddTransient<ICustomerService, CustomerService>();
         services.AddHostedService<PushCustomersWorker>();
     })
     .Build();
