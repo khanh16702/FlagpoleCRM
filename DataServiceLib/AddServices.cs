@@ -17,6 +17,7 @@ namespace DataServiceLib
             services.AddTransient<IWebsiteService, WebsiteService>();
             services.AddTransient<ICustomerService, CustomerService>();
             services.AddTransient<ICustomerFieldService, CustomerFieldService>();
+            services.AddTransient<ITemplateService, TemplateService>();
             return services;
         }
     }

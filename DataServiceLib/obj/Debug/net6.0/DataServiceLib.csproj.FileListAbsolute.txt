@@ -44,10 +44,10 @@ D:\Git Hub Code\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\DataServiceLib.dll
 D:\Git Hub Code\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\refint\DataServiceLib.dll
 D:\Git Hub Code\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\DataServiceLib.pdb
 D:\Git Hub Code\FlagpoleCRM\DataServiceLib\obj\Debug\net6.0\ref\DataServiceLib.dll
-D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\appsettings.Development.json
-D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\appsettings.json
 D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\FlagpoleCRM.deps.json
 D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\FlagpoleCRM.runtimeconfig.json
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\appsettings.Development.json
+D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\appsettings.json
 D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\FlagpoleCRM.staticwebassets.runtime.json
 D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\FlagpoleCRM.exe
 D:\GitHubCode\FlagpoleCRM\DataServiceLib\bin\Debug\net6.0\DataServiceLib.deps.json

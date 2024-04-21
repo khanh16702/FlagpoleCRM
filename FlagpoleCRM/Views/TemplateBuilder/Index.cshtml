@@ -1,0 +1,308 @@
+﻿@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .ck-editor__editable[role="textbox"] {
+        min-height: 500px;
+    }
+
+    .ck-content {
+        color: #333;
+    }
+</style>
+
+<main class="page-content">
+    <div class="breadcrumb-title pe-3" style="display:flex; justify-content:space-between; align-items:center">
+        Template List
+        <a class="btn btn-primary" href="#edit-template-zone" id="open-add-template">
+            <i class="bi bi-plus-lg" style="margin: 0"></i> Add template
+        </a>
+    </div>
+    <hr>
+    <div class="table-responsive" style="margin-top:20px">
+        <table id="template-list" class="table table-striped table-bordered custom-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Type</th>
+                    <th>Created Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <hr />
+    <div id ="edit-template-zone">
+        <div class="breadcrumb-title pe-3 mb-3">Edit template</div>
+        <div class="card shadow-none border">
+            <div class="card-body">
+                <form class="row g-3">
+                    <input type="hidden" id="template-type" value="1" />
+                    <div class="col-4">
+                        <label class="form-label">ID</label>
+                        <input type="text" class="form-control" id="template-id" value="" disabled />
+                    </div>
+                    <div class="col-4">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" value="" id="template-name">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Description</label>
+                        <input type="text" class="form-control" value="" id="template-description">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Content</label>
+                        <div id="template-content"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="text-start">
+            <button type="button" class="btn btn-primary px-4" id="save-template">Save template</button>
+        </div>
+    </div>
+
+    @*Delete template confirmation*@
+    <div class="modal fade" id="remove-template-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 400px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete template</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="delete-template-id" hidden/>
+                    Are you sure to delete this template?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="remove-template-confirm">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+@section Script {
+    <script>
+        var templateTable;
+        var editor;
+
+        $(document).ready(function () {
+            loadTemplates();
+            editor = CKEDITOR.replace('template-content', {
+                height: 400,
+                baseFloatZIndex: 10005,
+                on: {
+                    pluginsLoaded: function () {
+                        /* Add custom combo box (Merge Tags) */
+                        var editor = this,
+                            config = editor.config;
+
+                        editor.ui.addRichCombo('my-combo', {
+                            label: '{{_}}',
+                            title: 'Merge Tags',
+                            toolbar: 'insert,100',
+
+                            panel: {
+                                css: [CKEDITOR.skin.getPath('editor')].concat(config.contentsCss),
+                                multiSelect: false
+                            },
+
+                            init: function () {
+                                this.startGroup('Merge Tags');
+                                this.add('none', '');
+                                this.add('{{Contacts.FullName|Sir/Madam}}', '{{FullName|Sir/Madam}}');
+                                this.add('{{Contacts.Phone|0123456789}}', '{{Phone|0123456789}}');
+                                this.add('{{Contacts.Email|doe@mail.vn}}', '{{Email|doe@mail.vn}}');
+                                this.add('{{Contacts.Address|1A Main St.}}', '{{Address|1A Main St.}}');
+                                this.add('{{Birthday|01/01/1991}}', '{{Birthday|01/01/1991}}');
+                            },
+
+                            onClick: function (value) {
+                                editor.focus();
+                                editor.fire('saveSnapshot');
+                                editor.insertHtml(value);
+                                editor.fire('saveSnapshot');
+                            }
+                        });
+                    }
+                }
+            });
+        });
+
+        function loadTemplates() {
+            $('.loading').css('display', 'block');
+            $.ajax({
+                type: 'get',
+                url: `@Url.Action("GetTemplates", "TemplateBuilder")?websiteId=${localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE')}`
+            }).done(function (res) {
+                $('.loading').css('display', 'none');
+                templateTable = $('#template-list').DataTable({
+                    destroy: true,
+                    searching: true,
+                    lengthChange: false,
+                    className: 'dt-body-right',
+                    data: res,
+                    columns: renderColumns,
+                    order: [[5, 'desc']],
+                });
+
+                templateTable.on('order.dt search.dt', function () {
+                    templateTable.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                        cell.innerHTML = i + 1;
+                    });
+                }).draw();
+            })
+        };
+
+        var renderColumns = [
+            {
+                data: "id",
+                orderable: false
+            },
+            {
+                data: "id",
+                orderable: false
+            },
+            {
+                data: "name",
+                orderable: true
+            },
+            {
+                data: "description",
+                orderable: false
+            },
+            {
+                data: "typeAtView",
+                orderable: true
+            },
+            {
+                data: "createdDate",
+                orderable: true,
+                render: function (data) {
+                    return convertDate(data);
+                }
+            },
+            {
+                orderable: false,
+                render: function(data, type, row) {
+                    return `<div style="display:flex">
+                        <a class="btn btn-warning" onclick="editTemplate(${row.id})" href="#edit-template-zone" style="margin-right: 10px">
+                            <i class="bi bi-pencil-square" style="margin: 0"></i></a> 
+                        <a class="btn btn-danger" onclick="removeTemplate(${row.id})" data-bs-toggle="modal" data-bs-target="#remove-template-modal">
+                            <i class="bi bi-trash" style="margin: 0"></i></a>
+                    </div>`
+                }
+            }
+        ];
+
+        $('#open-add-template').click(function() {
+            resetEditTemplate();
+        });
+
+        $('#save-template').click(function() {
+            var id = $('#template-id').val();
+            var name = $('#template-name').val();
+            var description = $('#template-description').val();
+            var type = $('#template-type').val();
+            var websiteGuid = localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE');
+            var content = editor.getData();
+            var isDeleted = false;
+            if (!name) {
+                toastr_call('error','Error','Name is not set yet');
+            }
+            else {
+                $('.loading').css('display', 'block');
+                updateTemplate(id, name, description, type, websiteGuid, content, isDeleted);
+            }
+        });
+
+        function editTemplate(id) {
+            $.ajax({
+                url: `@Url.Action("GetTemplateById", "TemplateBuilder")?id=${id}`,
+                type: 'get',
+                success: (result) => {
+                    if (!result.isSuccessful) {
+                        toastr_call('error', 'Error', result.message);
+                    }
+                    else {
+                        var template = result.data;
+                        $('#template-id').val(template.id);
+                        $('#template-name').val(template.name);
+                        $('#template-description').val(template.description);
+                        editor.setData(`${template.content}`);
+                    }
+                }
+            })
+        }
+
+        function removeTemplate(id) {
+            $('#delete-template-id').val(id);
+        }
+
+        $('#remove-template-confirm').click(function() {
+            $('.loading').css('display', 'block');
+            var id = $('#delete-template-id').val();
+            $.ajax({
+                url: `@Url.Action("GetTemplateById", "TemplateBuilder")?id=${id}`,
+                type: 'get',
+                success: (result) => {
+                    if (!result.isSuccessful) {
+                        $('.loading').css('display', 'none');
+                        toastr_call('error', 'Error', result.message);
+                    }
+                    else {
+                        resetEditTemplate();
+                        var template = result.data;
+                        var id = template.id;
+                        var name = template.name;
+                        var description = template.description;
+                        var type = template.type;
+                        var websiteGuid = localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE');
+                        var content = template.content;
+                        var isDeleted = true;
+                        updateTemplate(id, name, description, type, websiteGuid, content, isDeleted);
+                        $('#remove-template-modal').modal('toggle');
+                    }
+                }
+            })
+        })
+
+        function updateTemplate(id, name, description, type, websiteGuid, content, isDeleted) {
+            $.ajax({
+                url: `@Url.Action("InsertOrUpdate", "TemplateBuilder")`,
+                type: 'post',
+                data: { id, name, description, type, websiteGuid, content, isDeleted },
+                success: (result) => {
+                    if (!result.isSuccessful) {
+                        toastr_call('error', 'Error', result.message);
+                    }
+                    else {
+                        resetEditTemplate();
+                        toastr_call('success', 'Success', 'Save template successfully');
+                        loadTemplates();
+                    }
+                    $('.loading').css('display', 'none');
+                }
+            })
+        }
+
+        function resetEditTemplate() {
+            $('#template-id').val('');
+            $('#template-name').val('');
+            $('#template-description').val('');
+            editor.setData(``);
+        }
+
+        $('#choose-websites').change(function () {
+            resetEditTemplate();
+            loadTemplates();
+        })
+    </script>
+}

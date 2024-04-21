@@ -602,12 +602,12 @@ D:\Git Hub Code\FlagpoleCRM\DataAPI\obj\Debug\net6.0\refint\DataAPI.dll
 D:\Git Hub Code\FlagpoleCRM\DataAPI\obj\Debug\net6.0\DataAPI.pdb
 D:\Git Hub Code\FlagpoleCRM\DataAPI\obj\Debug\net6.0\DataAPI.genruntimeconfig.cache
 D:\Git Hub Code\FlagpoleCRM\DataAPI\obj\Debug\net6.0\ref\DataAPI.dll
-D:\GitHubCode\FlagpoleCRM\DataAPI\bin\Debug\net6.0\appsettings.Development.json
-D:\GitHubCode\FlagpoleCRM\DataAPI\bin\Debug\net6.0\appsettings.json
 D:\GitHubCode\FlagpoleCRM\DataAPI\bin\Debug\net6.0\FlagpoleCRM.deps.json
 D:\GitHubCode\FlagpoleCRM\DataAPI\bin\Debug\net6.0\FlagpoleCRM.runtimeconfig.json
 D:\GitHubCode\FlagpoleCRM\DataAPI\bin\Debug\net6.0\FlagpoleCRM.staticwebassets.runtime.json
 D:\GitHubCode\FlagpoleCRM\DataAPI\bin\Debug\net6.0\FlagpoleCRM.exe
+D:\GitHubCode\FlagpoleCRM\DataAPI\bin\Debug\net6.0\appsettings.Development.json
+D:\GitHubCode\FlagpoleCRM\DataAPI\bin\Debug\net6.0\appsettings.json
 D:\GitHubCode\FlagpoleCRM\DataAPI\bin\Debug\net6.0\DataAPI.staticwebassets.runtime.json
 D:\GitHubCode\FlagpoleCRM\DataAPI\bin\Debug\net6.0\DataAPI.exe
 D:\GitHubCode\FlagpoleCRM\DataAPI\bin\Debug\net6.0\DataAPI.deps.json

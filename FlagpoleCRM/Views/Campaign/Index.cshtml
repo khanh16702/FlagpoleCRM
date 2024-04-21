@@ -1,3 +1,82 @@
 ﻿@{
     Layout = "/Views/Shared/_Layout.cshtml";
 }
+
+<main class="page-content">
+    <div class="breadcrumb-title pe-3" style="display:flex; justify-content:space-between; align-items:center">
+        Campaigns Management
+        <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#">
+            <i class="bi bi-plus-lg" style="margin: 0"></i> Add campaign
+        </a>
+    </div>
+    <hr>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-2 row-cols-xxl-4">
+        <div class="col">
+            <div class="card radius-10">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="">
+                            <p class="mb-1">Total Campaigns Created</p>
+                            <h4 class="mb-0 text-tiffany">0</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card radius-10">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="">
+                            <p class="mb-1">Total Campaigns Sent</p>
+                            <h4 class="mb-0 text-success">0</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card radius-10">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="">
+                            <p class="mb-1">Total Emails Sent</p>
+                            <h4 class="mb-0 text-orange">0</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card radius-10">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="">
+                            <p class="mb-1">Total Email Addresses</p>
+                            <h4 class="mb-0 text-pink">0</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="table-responsive" style="margin-top:20px">
+        <table id="campaign-list" class="table table-striped table-bordered custom-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Channel</th>
+                    <th>Status</th>
+                    <th>Success</th>
+                    <th>Failure</th>
+                    <th>Send Date</th>
+                    <th>Created Date</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</main>

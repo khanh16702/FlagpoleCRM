@@ -30,12 +30,12 @@ namespace DataServiceLib
         }
         public Website GetWebsiteByGuid(string id)
         {
-            return _flagpoleCRM.Websites.FirstOrDefault(x => x.Guid == id);
+            return _flagpoleCRM.Websites.FirstOrDefault(x => x.Guid == id && !x.IsDeleted);
         }
 
         public List<Website> GetWebsitesByAccountId(string accountId)
         {
-            return _flagpoleCRM.Websites.Where(x => x.AccountId == accountId).ToList();
+            return _flagpoleCRM.Websites.Where(x => x.AccountId == accountId && !x.IsDeleted).ToList();
         }
 
         public ResponseModel Insert(Website model)
@@ -45,7 +45,7 @@ namespace DataServiceLib
             {
                 model.Guid = Guid.NewGuid().ToString();
                 model.WebsiteType = 1;
-                model.CreatedDate = DateTime.Now;
+                model.CreatedDate = DateTime.UtcNow;
                 model.IsDeleted = false;
                 model.ShopifyStore = "";
                 model.ShopifyToken = "";

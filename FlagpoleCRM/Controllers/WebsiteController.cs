@@ -1,4 +1,5 @@
 ﻿using Common.Constant;
+using Common.Extension;
 using Common.Helper;
 using Common.Models;
 using FlagpoleCRM.DTO;
@@ -60,22 +61,44 @@ namespace FlagpoleCRM.Controllers
 
         public async Task<ResponseModel> CreateWebsite(string name, string accountId)
         {
-            var website = new Website() { Guid = "", Url = name, AccountId = accountId };
-            var response = (ResponseModel)await APIHelper.PostTemplateAsync(website, "/api/WebsiteAPI/CreateWebsite", _apiUrl, _superHeaderName, _superHeaderValue);
-            if (!response.IsSuccessful)
+            try
             {
-                _logger.LogError($"Create website name = {name}, accountId = {accountId} failed: {response.Message}");
+                var website = new Website() { Guid = "", Url = name, AccountId = accountId };
+                var response = (ResponseModel)await APIHelper.PostTemplateAsync(website, "/api/WebsiteAPI/CreateWebsite", _apiUrl, _superHeaderName, _superHeaderValue);
+                if (!response.IsSuccessful)
+                {
+                    throw new Exception(response.Message);
+                }
+                return response;
             }
-            return response;
+            catch(Exception ex)
+            {
+                _logger.LogError($"Create website name = {name}, accountId = {accountId} failed: {ex.Message}");
+                return new ResponseModel { IsSuccessful = false, Message = "Some errors occurred" };
+            }
         }
 
         public async Task<List<WebsiteDTO>> GetWebsites(string accountId)
         {
             try
             {
+                var getAccountParam = $"id={accountId}";
+                var findAcc = await APIHelper.SearchTemplateAsync($"/api/AccountAPI/GetAccountById?{getAccountParam}", _apiUrl, _superHeaderName, _superHeaderValue);
+                if (findAcc == null)
+                {
+                    throw new Exception("Current account not found");
+                }
+                var acc = JsonConvert.DeserializeObject<Account>(JsonConvert.SerializeObject(findAcc));
+                var timezone = acc.Timezone;
+
                 var prms = $"accountId={accountId}";
                 var websitesObj = await APIHelper.SearchTemplateAsync($"/api/WebsiteAPI/GetListWebsites?{prms}", _apiUrl, _superHeaderName, _superHeaderValue);
+
                 var websites = JsonConvert.DeserializeObject<List<WebsiteDTO>>(JsonConvert.SerializeObject(websitesObj));
+                foreach(Website website in websites)
+                {
+                    website.CreatedDate = website.CreatedDate.GetTimeWithOffset(timezone);
+                }
                 return websites;
             }
             catch(Exception e)
