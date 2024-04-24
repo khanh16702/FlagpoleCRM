@@ -22,15 +22,3 @@ D:\Git Hub Code\FlagpoleCRM\Common\obj\Debug\net6.0\Common.dll
 D:\Git Hub Code\FlagpoleCRM\Common\obj\Debug\net6.0\refint\Common.dll
 D:\Git Hub Code\FlagpoleCRM\Common\obj\Debug\net6.0\Common.pdb
 D:\Git Hub Code\FlagpoleCRM\Common\obj\Debug\net6.0\ref\Common.dll
-D:\GitHubCode\FlagpoleCRM\Common\bin\Debug\net6.0\Common.deps.json
-D:\GitHubCode\FlagpoleCRM\Common\bin\Debug\net6.0\Common.dll
-D:\GitHubCode\FlagpoleCRM\Common\bin\Debug\net6.0\Common.pdb
-D:\GitHubCode\FlagpoleCRM\Common\obj\Debug\net6.0\Common.csproj.AssemblyReference.cache
-D:\GitHubCode\FlagpoleCRM\Common\obj\Debug\net6.0\Common.GeneratedMSBuildEditorConfig.editorconfig
-D:\GitHubCode\FlagpoleCRM\Common\obj\Debug\net6.0\Common.AssemblyInfoInputs.cache
-D:\GitHubCode\FlagpoleCRM\Common\obj\Debug\net6.0\Common.AssemblyInfo.cs
-D:\GitHubCode\FlagpoleCRM\Common\obj\Debug\net6.0\Common.csproj.CoreCompileInputs.cache
-D:\GitHubCode\FlagpoleCRM\Common\obj\Debug\net6.0\Common.dll
-D:\GitHubCode\FlagpoleCRM\Common\obj\Debug\net6.0\refint\Common.dll
-D:\GitHubCode\FlagpoleCRM\Common\obj\Debug\net6.0\Common.pdb
-D:\GitHubCode\FlagpoleCRM\Common\obj\Debug\net6.0\ref\Common.dll
