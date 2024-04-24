@@ -1122,6 +1122,10 @@ a {
 	color: white !important;
 }
 
+.mark-required-field {
+	color: #EE9EA5;
+}
+
 .loading {
 	position: fixed;
 	z-index: 999999;

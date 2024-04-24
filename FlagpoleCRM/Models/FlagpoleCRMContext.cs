@@ -24,8 +24,8 @@ namespace FlagpoleCRM.Models
         public virtual DbSet<EmailAccount> EmailAccounts { get; set; } = null!;
         public virtual DbSet<PhoneAccount> PhoneAccounts { get; set; } = null!;
         public virtual DbSet<Website> Websites { get; set; } = null!;
-
-        public virtual DbSet<Template> Templates { get; set; } = null;
+        public virtual DbSet<Template> Templates { get; set; } = null!;
+        public virtual DbSet<UnsubcribedEmail> UnsubcribedEmails { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Account>(entity =>
@@ -41,11 +41,30 @@ namespace FlagpoleCRM.Models
             modelBuilder.Entity<AudienceCustomer>(entity =>
             {
                 entity.ToTable("Audience_Customer");
+
+                entity.HasOne(a => a.Audience)
+                    .WithMany(x => x.AudienceCustomers)
+                    .HasForeignKey(a => a.AudienceId);
             });
 
             modelBuilder.Entity<Campaign>(entity =>
             {
                 entity.ToTable("Campaign");
+                entity.HasOne(e => e.Email)
+                    .WithMany(c => c.Campaigns)
+                    .HasForeignKey(e => e.EmailId);
+                entity.HasOne(p => p.Phone)
+                    .WithMany(c => c.Campaigns)
+                    .HasForeignKey(p => p.PhoneId);
+                entity.HasOne(w => w.Website)
+                    .WithMany(c => c.Campaigns)
+                    .HasForeignKey(w => w.WebsiteId);
+                entity.HasOne(t => t.Template)
+                    .WithMany(c => c.Campaigns)
+                    .HasForeignKey(t => t.TemplateId);
+                entity.HasOne(a => a.Audience)
+                    .WithMany(c => c.Campaigns)
+                    .HasForeignKey(a => a.AudienceId);
             });
 
             modelBuilder.Entity<CustomerField>(entity =>
@@ -66,11 +85,19 @@ namespace FlagpoleCRM.Models
             modelBuilder.Entity<Website>(entity =>
             {
                 entity.ToTable("Website");
+                entity.HasOne(a => a.Account)
+                    .WithMany(w => w.Websites)
+                    .HasForeignKey(a => a.AccountId);
             });
 
             modelBuilder.Entity<Template>(entity =>
             {
                 entity.ToTable("Template");
+            });
+
+            modelBuilder.Entity<UnsubcribedEmail>(entity =>
+            {
+                entity.ToTable("UnsubcribedEmail");
             });
 
             OnModelCreatingPartial(modelBuilder);

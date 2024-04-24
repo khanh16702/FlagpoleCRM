@@ -12,12 +12,11 @@ namespace FlagpoleCRM.Models
 
         public int Id { get; set; }
         public string Email { get; set; } = null!;
-        public string? AcocuntId { get; set; }
         public bool IsDeleted { get; set; }
         public string Password { get; set; } = null!;
-        public bool? IsVerified { get; set; }
+        public string? WebsiteId { get; set; }
+        public DateTime? CreatedDate { get; set; }
 
-        public virtual Account? Acocunt { get; set; }
         public virtual ICollection<Campaign> Campaigns { get; set; }
     }
 }

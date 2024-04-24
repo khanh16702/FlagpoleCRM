@@ -8,6 +8,7 @@ namespace FlagpoleCRM.Models
         public Audience()
         {
             AudienceCustomers = new HashSet<AudienceCustomer>();
+            Campaigns = new HashSet<Campaign>();
         }
 
         public string Id { get; set; } = null!;
@@ -25,5 +26,6 @@ namespace FlagpoleCRM.Models
         public string WebsiteId { get; set; }
 
         public virtual ICollection<AudienceCustomer> AudienceCustomers { get; set; }
+        public virtual ICollection<Campaign>? Campaigns { get; set; }
     }
 }

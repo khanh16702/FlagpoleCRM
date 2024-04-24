@@ -79,9 +79,7 @@
                 websiteTable = $('#website-list').DataTable({
                     destroy: true,
                     searching: true,
-                    lengthChange: false,
                     className: 'dt-body-right',
-                    pageLength: 10,
                     data: res,
                     columns: renderColumns,
                     order: [[5, 'desc']],

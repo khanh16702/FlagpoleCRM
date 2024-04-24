@@ -8,8 +8,6 @@ namespace FlagpoleCRM.Models
     {
         public Account()
         {
-            EmailAccounts = new HashSet<EmailAccount>();
-            PhoneAccounts = new HashSet<PhoneAccount>();
             Websites = new HashSet<Website>();
         }
 
@@ -39,10 +37,7 @@ namespace FlagpoleCRM.Models
         public string? SecretKey { get; set; }
         [JsonProperty("salt")]
         public string? Salt { get; set; }
-        [JsonProperty("emailAccounts")]
-        public virtual ICollection<EmailAccount> EmailAccounts { get; set; }
         [JsonProperty("phoneAccounts")]
-        public virtual ICollection<PhoneAccount> PhoneAccounts { get; set; }
         public virtual ICollection<Website> Websites { get; set; }
     }
 }

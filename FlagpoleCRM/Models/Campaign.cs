@@ -10,9 +10,12 @@ namespace FlagpoleCRM.Models
         public string? Description { get; set; }
         public int? WebsiteId { get; set; }
         public string? WebsiteGuid { get; set; }
+        public int? TemplateId { get; set; }
+        public string? AudienceId { get; set; }
         public int SendStatus { get; set; }
         public int SendType { get; set; }
         public DateTime? SendDate { get; set; }
+        public string? SenderName { get; set; }
         public int? EmailId { get; set; }
         public int? PhoneId { get; set; }
         public int? Success { get; set; }
@@ -26,5 +29,6 @@ namespace FlagpoleCRM.Models
         public virtual PhoneAccount? Phone { get; set; }
         public virtual Website? Website { get; set; }
         public virtual Template? Template { get; set; }
+        public virtual Audience? Audience { get; set; }
     }
 }

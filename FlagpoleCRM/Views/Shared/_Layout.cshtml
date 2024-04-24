@@ -19,6 +19,7 @@
     <link href="/assets/plugins/toast/css/toastr.min.css" rel="stylesheet" />
     <link href="/assets/plugins/datatable/css/dataTables.min.css" rel="stylesheet" />
     <link href="/assets/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <link href="/assets/plugins/fontawesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" />
     
     <!--Theme Styles-->
     <link href="/assets/css/dark-theme.css" rel="stylesheet" />
@@ -257,9 +258,30 @@
         function convertDate(date) {
             var datePart = date.match(/\d+/g),
                 year = datePart[0].substring(),
-                month = datePart[1], day = datePart[2];
+                month = datePart[1], 
+                day = datePart[2];
 
             return day + '/' + month + '/' + year;
+        }
+
+        function convertDateTime(datetime) {
+            var datePart = datetime.match(/\d+/g),
+                year = datePart[0].substring(),
+                month = datePart[1], 
+                day = datePart[2],
+                hour = datePart[3],
+                minute = datePart[4];
+
+            return day + '/' + month + '/' + year + ' ' + hour + ':' + minute;
+        }
+
+        function getDateTimeFromDateObj(dateObject) {
+            var year = dateObject.getFullYear();
+            var month = (dateObject.getMonth() + 1).toString().padStart(2, '0');
+            var day = dateObject.getDate().toString().padStart(2, '0');
+            var hours = dateObject.getHours().toString().padStart(2, '0');
+            var minutes = dateObject.getMinutes().toString().padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
         }
     </script>
     @await RenderSectionAsync("Script", required: false)

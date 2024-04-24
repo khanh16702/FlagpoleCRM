@@ -322,7 +322,7 @@ namespace FlagpoleCRM.Controllers
 
         public ActionResult LoadSaveAudiencePopup(Audience audience)
         {
-            return PartialView("_CustomerSaveAudience", audience);
+            return PartialView("/Views/Shared/Customer/_CustomerSaveAudience.cshtml", audience);
         }
     }
 }

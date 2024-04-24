@@ -1,4 +1,5 @@
 ﻿using Common.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 
 namespace FlagpoleCRM.Models

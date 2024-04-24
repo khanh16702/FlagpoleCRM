@@ -1,6 +1,9 @@
 ﻿using Common.Constant;
+using Common.Enums;
+using Common.Extension;
 using Common.Helper;
 using Common.Models;
+using FlagpoleCRM.DTO;
 using FlagpoleCRM.Helper;
 using FlagpoleCRM.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -59,6 +62,225 @@ namespace FlagpoleCRM.Controllers
             {
                 return Redirect("/login/authentication/index");
             }
+        }
+
+        public async Task<ResponseModel> GetEmailSenderById(int id)
+        {
+            try
+            {
+                var param = $"id={id}";
+                var res = await APIHelper.SearchTemplateAsync($"/api/CampaignAPI/GetEmailSenderById?{param}", _apiUrl, _superHeaderName, _superHeaderValue);
+                if (res == null)
+                {
+                    throw new Exception("Email sender not found");
+                }
+                return new ResponseModel
+                {
+                    IsSuccessful = true,
+                    Data = JsonConvert.DeserializeObject<EmailAccount>(JsonConvert.SerializeObject(res))
+                };
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError($"Error when trying to get Email Sender Id = {id}: {ex.Message}");
+                return new ResponseModel
+                {
+                    IsSuccessful = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<List<EmailAccount>> GetListEmailSender(string accountId, string websiteId)
+        {
+            try
+            {
+                var getAccountParam = $"id={accountId}";
+                var findAcc = await APIHelper.SearchTemplateAsync($"/api/AccountAPI/GetAccountById?{getAccountParam}", _apiUrl, _superHeaderName, _superHeaderValue);
+                if (findAcc == null)
+                {
+                    throw new Exception("Current account not found");
+                }
+                var acc = JsonConvert.DeserializeObject<Account>(JsonConvert.SerializeObject(findAcc));
+                var timezone = acc.Timezone;
+
+                var prms = $"websiteId={websiteId}";
+                var res = await APIHelper.SearchTemplateAsync($"/api/CampaignAPI/GetListEmailSender?{prms}", _apiUrl, _superHeaderName, _superHeaderValue);
+                if (res == null)
+                {
+                    return new List<EmailAccount>();
+                }
+                var emailSenders = JsonConvert.DeserializeObject<List<EmailAccount>>(JsonConvert.SerializeObject(res));
+                foreach(EmailAccount emailSender in emailSenders)
+                {
+                    emailSender.CreatedDate = emailSender.CreatedDate.Value.GetTimeWithOffset(timezone);
+                }
+                return emailSenders;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError($"Error when trying to get list Email Senders of accountId = {accountId}: {ex.Message}");
+                return new List<EmailAccount>();
+            }
+        }
+
+        public async Task<ResponseModel> UpdateEmailSender(EmailAccount model)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password))
+                {
+                    return new ResponseModel { IsSuccessful = false, Message = "Email or password cannot be left blank" };
+                }
+                var res = await APIHelper.PostTemplateAsync(model, $"/api/CampaignAPI/UpdateEmailSender", _apiUrl, _superHeaderName, _superHeaderValue);
+                var response = JsonConvert.DeserializeObject<ResponseModel>(JsonConvert.SerializeObject(res));
+                if (!response.IsSuccessful)
+                {
+                    throw new Exception(response.Message);
+                }
+                return response;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError($"Error when trying to update EmaiSender Id = {model.Id}, WebsiteId = {model.WebsiteId}: {ex.Message}");
+                return new ResponseModel
+                {
+                    IsSuccessful = false,
+                    Message = "Some errors occurred"
+                };
+            }
+            
+        }
+
+        public ActionResult LoadManageEmailSenders(string accountId, string websiteId)
+        {
+            var model = new
+            {
+                AccountId = accountId,
+                WebsiteId = websiteId
+            };
+            return PartialView("/Views/Shared/Campaign/_CampaignManageSenders.cshtml", model);
+        }
+
+        public ActionResult LoadModifyCampaignView(CampaignDTO campaign)
+        {
+            return PartialView("/Views/Shared/Campaign/_CampaignModify.cshtml", campaign);
+        }
+
+        public async Task<List<Campaign>> GetListCampaign(string accountId, string websiteId)
+        {
+            var getAccountParam = $"id={accountId}";
+            var findAcc = await APIHelper.SearchTemplateAsync($"/api/AccountAPI/GetAccountById?{getAccountParam}", _apiUrl, _superHeaderName, _superHeaderValue);
+            if (findAcc == null)
+            {
+                throw new Exception("Current account not found");
+            }
+            var acc = JsonConvert.DeserializeObject<Account>(JsonConvert.SerializeObject(findAcc));
+            var timezone = acc.Timezone;
+
+            var prms = $"websiteId={websiteId}";
+            var res = await APIHelper.SearchTemplateAsync($"/api/CampaignAPI/GetListCampaign?{prms}", _apiUrl, _superHeaderName, _superHeaderValue);
+            if (res == null)
+            {
+                return new List<Campaign>();
+            }
+            var campaigns = JsonConvert.DeserializeObject<List<Campaign>>(JsonConvert.SerializeObject(res));
+            foreach (Campaign campaign in campaigns)
+            {
+                campaign.CreatedDate = campaign.CreatedDate.GetTimeWithOffset(timezone);
+                campaign.ModifiedDate = campaign.ModifiedDate.HasValue 
+                    ? campaign.ModifiedDate.Value.GetTimeWithOffset(timezone)
+                    : null;
+                campaign.SendDate = campaign.SendDate.Value.GetTimeWithOffset(timezone);
+            }
+            return campaigns;
+        }
+
+        public async Task<ResponseModel> GetCampaignById(int id)
+        {
+            try
+            {
+                var param = $"id={id}";
+                var res = await APIHelper.SearchTemplateAsync($"/api/CampaignAPI/GetCampaignById?{param}", _apiUrl, _superHeaderName, _superHeaderValue);
+                if (res == null)
+                {
+                    throw new Exception("Campaign not found");
+                }
+                return new ResponseModel
+                {
+                    IsSuccessful = true,
+                    Data = JsonConvert.DeserializeObject<Campaign>(JsonConvert.SerializeObject(res))
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error when trying to get Campaign Id = {id}: {ex.Message}");
+                return new ResponseModel
+                {
+                    IsSuccessful = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<ResponseModel> UpdateCampaign(CampaignDTO model)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(model.Name) || string.IsNullOrWhiteSpace(model.SenderName))
+                {
+                    return new ResponseModel { IsSuccessful = false, Message = "Required fields cannot be left blank" };
+                }
+
+                if (model.SendType == (int)ESendType.Scheduled && model.SendDate.Value.Subtract(DateTime.Now).TotalMinutes < 30)
+                {
+                    return new ResponseModel { IsSuccessful = false, Message = "Scheduled date must be at least 30 minutes later from now" };
+                }
+
+                var getAccountParam = $"id={model.AccountId}";
+                var findAcc = await APIHelper.SearchTemplateAsync($"/api/AccountAPI/GetAccountById?{getAccountParam}", _apiUrl, _superHeaderName, _superHeaderValue);
+                if (findAcc == null)
+                {
+                    throw new Exception("Current account not found");
+                }
+                var acc = JsonConvert.DeserializeObject<Account>(JsonConvert.SerializeObject(findAcc));
+                var timezone = acc.Timezone;
+
+                var getWebsiteParam = $"id={model.WebsiteGuid}";
+                var findWeb = await APIHelper.SearchTemplateAsync($"/api/WebsiteAPI/GetWebsiteById?{getWebsiteParam}", _apiUrl, _superHeaderName, _superHeaderValue);
+                if (findWeb == null)
+                {
+                    throw new Exception("Current account not found");
+                }
+                var webId = JsonConvert.DeserializeObject<Website>(JsonConvert.SerializeObject(findWeb)).Id;
+                model.WebsiteId = webId;
+
+                model.SendDate = model.SendDate.Value.GetUTCTime(timezone);
+                var campaign = new Campaign();
+                var props = typeof(Campaign).GetProperties();
+                foreach (var prop in props)
+                {
+                    prop.SetValue(campaign, prop.GetValue(model));
+                }
+
+                var res = await APIHelper.PostTemplateAsync(campaign, $"/api/CampaignAPI/UpdateCampaign", _apiUrl, _superHeaderName, _superHeaderValue);
+                var response = JsonConvert.DeserializeObject<ResponseModel>(JsonConvert.SerializeObject(res));
+                if (!response.IsSuccessful)
+                {
+                    throw new Exception(response.Message);
+                }
+                return response;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError($"Error when trying to update Campaign Id = {model.Id}, WebsiteId = {model.WebsiteId}: {ex.Message}");
+                return new ResponseModel
+                {
+                    IsSuccessful = false,
+                    Message = "Some errors occurred"
+                };
+            }
+
         }
     }
 }
