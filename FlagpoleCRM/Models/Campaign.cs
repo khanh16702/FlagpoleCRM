@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace FlagpoleCRM.Models
@@ -24,6 +25,30 @@ namespace FlagpoleCRM.Models
         public DateTime CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
+
+        public string SendStatusAtView
+        {
+            get
+            {
+                return Enum.GetName(typeof(ESendStatus), SendStatus);
+            }
+        }
+
+        public string SendTypeAtView
+        {
+            get
+            {
+                return Enum.GetName(typeof(ESendType), SendType);
+            }
+        }
+
+        public string ChannelAtView
+        {
+            get
+            {
+                return Enum.GetName(typeof(EChannelSubscribe), Channel);
+            }
+        }
 
         public virtual EmailAccount? Email { get; set; }
         public virtual PhoneAccount? Phone { get; set; }

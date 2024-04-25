@@ -1,4 +1,6 @@
 ﻿@using Common.Enums
+@using FlagpoleCRM.DTO
+@model CampaignDTO
 
 <style>
     .campaign-input {
@@ -52,11 +54,25 @@
                         <label class="campaign-label">Template</label>
                         <select class="form-control" id="campaign-template"></select>
                         <label class="campaign-label">Schedule</label><br>
-                        <input type="radio" id="send-now" name="campaign-schedule" value="0">
-                        <label for="send-now">Send now</label><br>
-                        <input type="radio" id="send-then" name="campaign-schedule" value="1" checked>
-                        <label for="send-then">Send at</label><br />
-                        <input type="datetime-local" class="form-control" style="color-scheme: dark" id="campaign-send-date">
+                        @if (Model.SendType == (int)ESendType.Immediate) {
+                            <input type="radio" id="send-now" name="campaign-schedule" value="0" checked>
+                            <label for="send-now">Send now</label>
+                            <br>
+                            <input type="radio" id="send-then" name="campaign-schedule" value="1" >
+                            <label for="send-then">Send at</label>
+                            <br />
+                            <input type="datetime-local" class="form-control" style="color-scheme: dark" id="campaign-send-date" hidden>
+                        }
+                        else {
+                            <input type="radio" id="send-now" name="campaign-schedule" value="0" >
+                            <label for="send-now">Send now</label>
+                            <br>
+                            <input type="radio" id="send-then" name="campaign-schedule" value="1" checked>
+                            <label for="send-then">Send at</label>
+                            <br />
+                            <input type="datetime-local" class="form-control" style="color-scheme: dark" id="campaign-send-date" value="@Model.SendDateAtInput">
+                        }
+                        
                         @if (Model.SendStatus != (int)ESendStatus.Sending && Model.SendStatus != (int)ESendStatus.Complete) {
                             <a class="btn btn-primary mt-3" id="save-campaign">Save campaign</a>
                         }
@@ -101,18 +117,24 @@
             type: 'get',
             success: (result) => {
                 $('#campaign-template').html('');
+                var templateId = 0;
                 result.forEach((value, index) => {
                     var attr = '';
                     if ('@Model.TemplateId' == value.id) {
                         attr = 'selected';
+                        templateId = value.id;
                     }
                     else {
                         attr = '';
                     }
                     $('#campaign-template').append(`<option value="${value.id}" ${attr}>${value.name}</option>`);
-                    var templateId = $('#campaign-template').find(":selected").val();
-                    showTemplatePreview(templateId);
                 });
+                if (templateId != 0) {
+                    showTemplatePreview(templateId);
+                }
+                else {
+                    showTemplatePreview($('#campaign-template').find(":selected").val());
+                }
             }
         });
     }
@@ -166,6 +188,7 @@
         var sendDate = sendType == 0 ? getDateTimeFromDateObj(new Date()) : $('#campaign-send-date').val();
         var channel = @((int)EChannelSubscribe.Email);
         var websiteGuid = '@Model.WebsiteGuid';
+        var timezone = '@Html.Raw(Model.Timezone)';
 
         if (!name || !senderName) {
             toastr_call('error', 'Error', 'Required fields cannot be left blank');
@@ -174,7 +197,7 @@
             $.ajax({
                 url: `@Url.Action("UpdateCampaign", "Campaign")`,
                 type: 'post',
-                data: { id, name, description, audienceId, templateId, emailId, senderName, accountId, sendType, sendDate, channel, websiteGuid },
+                data: { id, name, description, audienceId, templateId, emailId, senderName, accountId, sendType, sendDate, channel, websiteGuid, timezone },
                 success: (result) => {
                     if (!result.isSuccessful) {
                         toastr_call('error', 'Error', result.message);
@@ -187,6 +210,10 @@
             });
         }
     });
+
+    $('#campaign-template').change(function() {
+        showTemplatePreview(this.value);
+    })
 
     $('input[name=campaign-schedule]').change(function() {
         if (this.value == 0) {

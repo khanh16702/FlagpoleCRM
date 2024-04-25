@@ -6,5 +6,7 @@ namespace FlagpoleCRM.DTO
     {
         public string? AccountId { get; set; }
         public string? AccountEmail { get; set; }
+        public string? Timezone { get; set; }
+        public string? SendDateAtInput { get; set; }
     }
 }

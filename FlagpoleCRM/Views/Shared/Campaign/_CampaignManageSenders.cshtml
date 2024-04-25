@@ -105,9 +105,10 @@
     })
 
     function loadEmailSenders() {
+        var timezone = encodeURIComponent('@Html.Raw(Model.Timezone)');
         $('.loading').css('display', 'block');
         $.ajax({
-            url: `@Url.Action("GetListEmailSender", "Campaign")?accountId=@Model.AccountId&websiteId=@Model.WebsiteId`,
+            url: `@Url.Action("GetListEmailSender", "Campaign")?accountId=@Model.AccountId&timezone=${timezone}&websiteId=@Model.WebsiteId`,
             type: 'get'
         }).done(function (res) {
             $('.loading').css('display', 'none');

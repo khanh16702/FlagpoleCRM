@@ -9,7 +9,7 @@ namespace Common.Enums
 {
     public enum ESendType
     {
-        Immediate = 1,
-        Scheduled = 2
+        Immediate = 0,
+        Scheduled = 1
     }
 }

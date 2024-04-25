@@ -47,6 +47,7 @@ namespace FlagpoleCRM.Controllers
                 var currentAcc = JsonConvert.DeserializeObject<Account>(JsonConvert.SerializeObject(findAcc));
                 TempData["avatar"] = currentAcc.Avatar;
                 TempData["fullName"] = currentAcc.FullName;
+                TempData["timezone"] = currentAcc.Timezone;
 
                 var prm = $"accountId={userInfo.Id}";
                 var websitesObj = await APIHelper.SearchTemplateAsync($"/api/WebsiteAPI/GetListWebsites?{prm}", _apiUrl, _superHeaderName, _superHeaderValue);
@@ -91,19 +92,10 @@ namespace FlagpoleCRM.Controllers
             }
         }
 
-        public async Task<List<EmailAccount>> GetListEmailSender(string accountId, string websiteId)
+        public async Task<List<EmailAccount>> GetListEmailSender(string accountId, string timezone, string websiteId)
         {
             try
             {
-                var getAccountParam = $"id={accountId}";
-                var findAcc = await APIHelper.SearchTemplateAsync($"/api/AccountAPI/GetAccountById?{getAccountParam}", _apiUrl, _superHeaderName, _superHeaderValue);
-                if (findAcc == null)
-                {
-                    throw new Exception("Current account not found");
-                }
-                var acc = JsonConvert.DeserializeObject<Account>(JsonConvert.SerializeObject(findAcc));
-                var timezone = acc.Timezone;
-
                 var prms = $"websiteId={websiteId}";
                 var res = await APIHelper.SearchTemplateAsync($"/api/CampaignAPI/GetListEmailSender?{prms}", _apiUrl, _superHeaderName, _superHeaderValue);
                 if (res == null)
@@ -152,32 +144,31 @@ namespace FlagpoleCRM.Controllers
             
         }
 
-        public ActionResult LoadManageEmailSenders(string accountId, string websiteId)
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
+        public ActionResult LoadManageEmailSenders(string accountId, string websiteId, string timezone)
         {
             var model = new
             {
                 AccountId = accountId,
-                WebsiteId = websiteId
+                WebsiteId = websiteId,
+                Timezone = timezone
             };
             return PartialView("/Views/Shared/Campaign/_CampaignManageSenders.cshtml", model);
         }
 
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public ActionResult LoadModifyCampaignView(CampaignDTO campaign)
         {
+            if (campaign.SendDate.HasValue)
+            {
+                campaign.SendDate = campaign.SendDate.Value.GetTimeWithOffset(campaign.Timezone);
+                campaign.SendDateAtInput = campaign.SendDate.Value.ToString("yyyy-MM-ddTHH:mm");
+            }
             return PartialView("/Views/Shared/Campaign/_CampaignModify.cshtml", campaign);
         }
 
-        public async Task<List<Campaign>> GetListCampaign(string accountId, string websiteId)
+        public async Task<List<Campaign>> GetListCampaign(string timezone, string websiteId)
         {
-            var getAccountParam = $"id={accountId}";
-            var findAcc = await APIHelper.SearchTemplateAsync($"/api/AccountAPI/GetAccountById?{getAccountParam}", _apiUrl, _superHeaderName, _superHeaderValue);
-            if (findAcc == null)
-            {
-                throw new Exception("Current account not found");
-            }
-            var acc = JsonConvert.DeserializeObject<Account>(JsonConvert.SerializeObject(findAcc));
-            var timezone = acc.Timezone;
-
             var prms = $"websiteId={websiteId}";
             var res = await APIHelper.SearchTemplateAsync($"/api/CampaignAPI/GetListCampaign?{prms}", _apiUrl, _superHeaderName, _superHeaderValue);
             if (res == null)
@@ -237,15 +228,6 @@ namespace FlagpoleCRM.Controllers
                     return new ResponseModel { IsSuccessful = false, Message = "Scheduled date must be at least 30 minutes later from now" };
                 }
 
-                var getAccountParam = $"id={model.AccountId}";
-                var findAcc = await APIHelper.SearchTemplateAsync($"/api/AccountAPI/GetAccountById?{getAccountParam}", _apiUrl, _superHeaderName, _superHeaderValue);
-                if (findAcc == null)
-                {
-                    throw new Exception("Current account not found");
-                }
-                var acc = JsonConvert.DeserializeObject<Account>(JsonConvert.SerializeObject(findAcc));
-                var timezone = acc.Timezone;
-
                 var getWebsiteParam = $"id={model.WebsiteGuid}";
                 var findWeb = await APIHelper.SearchTemplateAsync($"/api/WebsiteAPI/GetWebsiteById?{getWebsiteParam}", _apiUrl, _superHeaderName, _superHeaderValue);
                 if (findWeb == null)
@@ -255,11 +237,16 @@ namespace FlagpoleCRM.Controllers
                 var webId = JsonConvert.DeserializeObject<Website>(JsonConvert.SerializeObject(findWeb)).Id;
                 model.WebsiteId = webId;
 
-                model.SendDate = model.SendDate.Value.GetUTCTime(timezone);
+                model.SendDate = model.SendDate.Value.GetUTCTime(model.Timezone);
+                model.SendStatus = (int)ESendStatus.Waiting;
                 var campaign = new Campaign();
                 var props = typeof(Campaign).GetProperties();
                 foreach (var prop in props)
                 {
+                    if (prop.Name == "SendStatusAtView" || prop.Name == "SendTypeAtView" || prop.Name == "ChannelAtView")
+                    {
+                        break;
+                    }
                     prop.SetValue(campaign, prop.GetValue(model));
                 }
 

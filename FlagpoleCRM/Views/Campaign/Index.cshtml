@@ -1,7 +1,6 @@
 ﻿@{
     Layout = "/Views/Shared/_Layout.cshtml";
     var accountId = TempData["id"];
-    var campaignId = 0;
 }
 @using Common.Enums;
 
@@ -21,7 +20,7 @@
 <main class="page-content">
     <div class="breadcrumb-title pe-3" style="display:flex; justify-content:space-between; align-items:center">
         Campaigns Management
-        <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-campaign-modal">
+        <a class="btn btn-primary" id="add-new-campaign">
             <i class="bi bi-plus-lg" style="margin: 0"></i> Add campaign
         </a>
     </div>
@@ -103,6 +102,26 @@
     <div id="manage-senders"></div>
 
     <div id="modify-campaign"></div>
+
+    @*Delete campaign confirmation*@
+    <div class="modal fade" id="remove-campaign-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 500px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete campaign</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="delete-campaign-id" hidden />
+                    Are you sure to delete this campaign?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="remove-campaign-confirm">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 
 @section Script {
@@ -112,13 +131,14 @@
         $(document).ready(function() {
             loadCampaigns();
             loadManageEmailSenders();
-            loadModifyCampaignView();
+            loadModifyCampaignView({ id: 0 });
         });
 
         function loadCampaigns() {
+            var timezone = encodeURIComponent('@Html.Raw(TempData["timezone"])');
             $('.loading').css('display', 'block');
             $.ajax({
-                url: `@Url.Action("GetListCampaign", "Campaign")?accountId=@accountId&websiteId=${localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE')}`,
+                url: `@Url.Action("GetListCampaign", "Campaign")?timezone=${timezone}&websiteId=${localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE')}`,
                 type: 'get'
             }).done(function (res) {
                 $('.loading').css('display', 'none');
@@ -154,15 +174,18 @@
                 {
                     data: "description",
                     class: 'text-nowrap',
-                    orderable: false
+                    orderable: false,
+                    render: function (data) {
+                        return data ?? '-';
+                    }
                 },
                 {
-                    data: "channel",
+                    data: "channelAtView",
                     class: 'text-nowrap',
                     orderable: false
                 },
                 {
-                    data: "sendStatus",
+                    data: "sendStatusAtView",
                     class: 'text-nowrap',
                     orderable: false
                 },
@@ -211,7 +234,7 @@
                         }
                         else {
                             return `<div style="display:flex">
-                                        <a class="btn btn-primary" onclick="editCampaign(${row.id})" style="margin-right: 10px">
+                                        <a class="btn btn-primary" onclick="editCampaign(${row.id})" data-bs-toggle="modal" data-bs-target="#remove-campaign-modal" style="margin-right: 10px">
                                             <i class="bi bi-eye-fill" style="margin: 0"></i></a>
                                     </div>`
                         }
@@ -223,43 +246,100 @@
 
         function loadManageEmailSenders() { 
             $.ajax({
-                url: `@Url.Action("LoadManageEmailSenders", "Campaign")?accountId=@accountId&websiteId=${localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE')}`,
+                url: `@Url.Action("LoadManageEmailSenders", "Campaign")`,
                 type: 'get',
+                data: {
+                    accountId: '@accountId',
+                    websiteId: localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE'),
+                    timezone: '@Html.Raw(TempData["timezone"])'
+                },
                 success: (data) => {
                     $('#manage-senders').html(data);
                 }
             });
         }
 
-        function loadModifyCampaignView() {
-            var websiteGuid = localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE');
-            var accountEmail = '@TempData["email"]';
-            var accountId = '@TempData["id"]';
-            var id = @campaignId;
+        function loadModifyCampaignView(campaign) {
+            campaign.websiteGuid = localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE');
+            campaign.accountEmail = '@TempData["email"]';
+            campaign.accountId = '@TempData["id"]';
+            campaign.timezone = '@Html.Raw(TempData["timezone"])';
             $.ajax({
                 url: `@Url.Action("LoadModifyCampaignView", "Campaign")`,
                 type: 'post',
-                data: { id, websiteGuid, accountEmail, accountId },
+                data: campaign,
                 success: (data) => {
                     $('#modify-campaign').html(data);
                 }
             });
         }
 
-        function getCampaignById(id) {
-            $.ajax({
-                url: `@Url.Action("LoadModifyCampaignView", "Campaign")`,
-                type: 'post',
-                data: { id, websiteGuid, accountEmail, accountId },
-                success: (data) => {
-                    $('#modify-campaign').html(data);
-                }
-            });
-        }
+        $('#add-new-campaign').click(function() {
+            loadModifyCampaignView({ id: 0 });
+            $('.loading').css('display', 'block');
+            setTimeout(function() {
+                $('#add-campaign-modal').modal('toggle');
+                $('.loading').css('display', 'none');
+            }, 500);
+        })
 
         function editCampaign(id) {
-
+            $.ajax({
+                url: `@Url.Action("GetCampaignById", "Campaign")?id=${id}`,
+                type: 'get',
+                success: (result) => {
+                    if (!result.isSuccessful) {
+                        toastr_call('error', 'Error', result.message);
+                    }
+                    else {
+                        loadModifyCampaignView(result.data);
+                        $('.loading').css('display', 'block');
+                        setTimeout(function () {
+                            $('#add-campaign-modal').modal('toggle');
+                            $('.loading').css('display', 'none');
+                        }, 500);
+                    }
+                }
+            });
         }
+
+        function removeCampaign(id) {
+            $('#delete-campaign-id').val(id);
+        }
+
+        $('#remove-campaign-confirm').click(function() {
+            var campaignId = $('#delete-campaign-id').val();
+            $.ajax({
+                url: `@Url.Action("GetCampaignById", "Campaign")?id=${campaignId}`,
+                type: 'get',
+                success: (result) => {
+                    if (!result.isSuccessful) {
+                        toastr_call('error', 'Error', result.message);
+                    }
+                    else {
+                        var campaign = result.data;
+                        campaign.isDeleted = true;
+                        setTimeout(function() {
+                            $.ajax({
+                                url: `@Url.Action("UpdateCampaign", "Campaign")`,
+                                type: 'post',
+                                data: campaign,
+                                success: (result) => {
+                                    if (!result.isSuccessful) {
+                                        toastr_call('error', 'Error', result.message);
+                                    }
+                                    else {
+                                        toastr_call('success', 'Success', 'Update campaign successfully');
+                                        $('#remove-campaign-modal').modal('toggle');
+                                        loadCampaigns();
+                                    }
+                                }
+                            });
+                        }, 100);
+                    }
+                }
+            });
+        });
 
         $('#choose-websites').change(function () {
             loadCampaigns();
