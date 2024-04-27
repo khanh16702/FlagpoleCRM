@@ -167,12 +167,12 @@ namespace SendCampaigns
                                                 // Create unsubscribe token
                                                 var claims = new List<Claim>()
                                                 {
-                                                    new Claim("Id", customerId),
+                                                    new Claim(ClaimTypes.NameIdentifier, campaign.WebsiteGuid),
                                                     new Claim(ClaimTypes.Email, contact.Email)
                                                 };
                                                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"]));
                                                 var credits = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-                                                var token = new JwtSecurityToken(claims: claims, expires: DateTime.MaxValue, signingCredentials: credits);
+                                                var token = new JwtSecurityToken(claims: claims, expires: new DateTime(2035, 1, 1), signingCredentials: credits);
                                                 var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
                                                 body += "<div style=\"margin: 30px; color: #2E5274\">" +

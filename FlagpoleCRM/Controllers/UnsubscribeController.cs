@@ -34,8 +34,9 @@ namespace FlagpoleCRM.Controllers
                 var model = JsonConvert.DeserializeObject<JwtModel>(JsonConvert.SerializeObject(validateJwt.Data));
                 var unsub = new UnsubcribedEmail
                 {
+                    Id = 0,
                     Email = model.Email,
-                    WebsiteId = model.WebsiteId
+                    WebsiteId = model.Id
                 };
                 var resObj = await APIHelper.PostTemplateAsync(unsub, $"/api/UnsubscribeAPI/UpdateUnsubscribe", _apiUrl, _superHeaderName, _superHeaderValue);
                 if (resObj == null)
