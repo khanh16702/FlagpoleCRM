@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SyncData", "SyncData\SyncDa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PushCustomers", "PushCustomer\PushCustomers.csproj", "{8A93A572-C0D2-4989-895B-88EF5BC1C066}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyncAudiences", "SyncAudiences\SyncAudiences.csproj", "{0238FAFD-1C89-45CC-890F-054A252BFC7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SyncAudiences", "SyncAudiences\SyncAudiences.csproj", "{0238FAFD-1C89-45CC-890F-054A252BFC7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SendCampaigns", "SendCampaigns\SendCampaigns.csproj", "{ACB945AA-E0B6-4819-842F-9EB95A33BDCA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +61,10 @@ Global
 		{0238FAFD-1C89-45CC-890F-054A252BFC7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0238FAFD-1C89-45CC-890F-054A252BFC7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0238FAFD-1C89-45CC-890F-054A252BFC7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACB945AA-E0B6-4819-842F-9EB95A33BDCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACB945AA-E0B6-4819-842F-9EB95A33BDCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACB945AA-E0B6-4819-842F-9EB95A33BDCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACB945AA-E0B6-4819-842F-9EB95A33BDCA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,6 +80,7 @@ Global
 		{1522C1FA-7A19-4A1E-A79E-A966D559E9F5} = {1E57CCD1-830D-442C-A299-C0940575C42B}
 		{8A93A572-C0D2-4989-895B-88EF5BC1C066} = {1E57CCD1-830D-442C-A299-C0940575C42B}
 		{0238FAFD-1C89-45CC-890F-054A252BFC7B} = {1E57CCD1-830D-442C-A299-C0940575C42B}
+		{ACB945AA-E0B6-4819-842F-9EB95A33BDCA} = {1E57CCD1-830D-442C-A299-C0940575C42B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {88FDD812-E58C-4849-B13D-D63231082939}

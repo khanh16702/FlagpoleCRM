@@ -12,6 +12,7 @@ namespace DataServiceLib
         List<Audience> GetAudiences(string websiteId);
         List<Audience> GetDynamicAudiences();
         Audience GetAudienceByName(string name, string websiteId);
+        Audience GetAudienceById(string id);
         ResponseModel DeleteAudience(string id);
         List<AudienceCustomer> GetAudienceCustomersByAudienceId(string audienceId);
         AudienceCustomer FindAudienceCustomer(string audienceId, string customerId);
@@ -94,6 +95,11 @@ namespace DataServiceLib
         public Audience GetAudienceByName(string name, string websiteId)
         {
             return _flagpoleCRM.Audiences.FirstOrDefault(x => x.Name == name && x.WebsiteId == websiteId && !x.IsDeleted);
+        }
+
+        public Audience GetAudienceById(string id)
+        {
+            return _flagpoleCRM.Audiences.FirstOrDefault(x => x.Id == id && !x.IsDeleted);
         }
 
         public ResponseModel DeleteAudience(string id)

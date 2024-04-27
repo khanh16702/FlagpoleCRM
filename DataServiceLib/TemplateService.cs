@@ -48,6 +48,7 @@ namespace DataServiceLib
                         Name = model.Name,
                         Description = model.Description,
                         Type = model.Type,
+                        Subject = model.Subject,
                         Content = model.Content,
                         WebsiteId = model.WebsiteId,
                         WebsiteGuid = model.WebsiteGuid,
@@ -67,6 +68,7 @@ namespace DataServiceLib
                     template.Name = model.Name;
                     template.Description = model.Description;
                     template.Type = model.Type;
+                    template.Subject = model.Subject;
                     template.Content = model.Content;
                     template.IsDeleted = model.IsDeleted;
                     _flagpoleCRM.Templates.Update(template);

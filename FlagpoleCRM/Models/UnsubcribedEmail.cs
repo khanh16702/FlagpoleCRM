@@ -8,6 +8,7 @@ namespace FlagpoleCRM.Models
         public string Email { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
+        public string? WebsiteId { get; set; }
         public bool IsDeleted { get; set; }
     }
 }

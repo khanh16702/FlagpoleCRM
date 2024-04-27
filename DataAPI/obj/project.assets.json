@@ -12840,6 +12840,7 @@
   },
   "projectFileDependencyGroups": {
     "net6.0": [
+      "Common >= 1.0.0",
       "DataServiceLib >= 1.0.0",
       "FlagpoleCRM >= 1.0.0",
       "MailKit >= 4.3.0",
@@ -12886,6 +12887,9 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
+            "D:\\GitHubCode\\FlagpoleCRM\\Common\\Common.csproj": {
+              "projectPath": "D:\\GitHubCode\\FlagpoleCRM\\Common\\Common.csproj"
+            },
             "D:\\GitHubCode\\FlagpoleCRM\\DataServiceLib\\DataServiceLib.csproj": {
               "projectPath": "D:\\GitHubCode\\FlagpoleCRM\\DataServiceLib\\DataServiceLib.csproj"
             },

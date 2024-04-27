@@ -269,5 +269,26 @@ namespace FlagpoleCRM.Controllers
             }
 
         }
+
+        public async Task<ResponseModel> GetRedisValue(string websiteId)
+        {
+            try 
+            {
+                var prms = $"websiteId={websiteId}&today={DateTime.UtcNow}";
+                var res = await APIHelper.SearchTemplateAsync($"/api/CampaignAPI/GetRedisValue?{prms}", _apiUrl, _superHeaderName, _superHeaderValue);
+                var response = JsonConvert.DeserializeObject<ResponseModel>(JsonConvert.SerializeObject(res));
+                response.Data = JsonConvert.DeserializeObject<CampaignStatisticModel>(response.Data.ToString());
+                return response;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError($"Error when trying to get Redis campaigns statistic at WebsiteId = {websiteId}: {ex.Message}");
+                return new ResponseModel
+                {
+                    IsSuccessful = false,
+                    Message = "Couldn't load Campaign statistic now"
+                };
+            }
+        }
     }
 }

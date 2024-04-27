@@ -18,6 +18,7 @@ namespace DataServiceLib
 
         Campaign GetCampaignById(int id);
         List<Campaign> GetListCampaign(string websiteId);
+        List<Campaign> GetProcessCampaigns();
         ResponseModel UpdateCampaign(Campaign model);
     }
     public class CampaignService : ICampaignService
@@ -96,6 +97,17 @@ namespace DataServiceLib
         public List<Campaign> GetListCampaign(string websiteId)
         {
             return _flagpoleCRM.Campaigns.Where(x => x.WebsiteGuid == websiteId && !x.IsDeleted).ToList();
+        }
+
+        public List<Campaign> GetProcessCampaigns()
+        {
+            return _flagpoleCRM.Campaigns
+                .Where(x => x.SendDate.HasValue 
+                    && DateTime.Compare(x.SendDate.Value, DateTime.UtcNow) <= 0 
+                    && x.SendStatus == (int)ESendStatus.Waiting
+                    && !x.IsDeleted)
+                .OrderBy(x => x.Id)
+                .ToList();
         }
 
         public ResponseModel UpdateCampaign(Campaign model)

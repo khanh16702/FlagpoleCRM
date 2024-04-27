@@ -15,6 +15,7 @@ namespace FlagpoleCRM.Models
         public string Name { get; set; }
         public string? Description { get; set; }
         public int? Type { get; set; }
+        public string? Subject { get; set; }
         public string? Content { get; set; }
         public int? WebsiteId { get; set; }
         public string? WebsiteGuid { get; set; }

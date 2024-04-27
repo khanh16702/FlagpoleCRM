@@ -32,7 +32,7 @@
                     <div class="d-flex align-items-center">
                         <div class="">
                             <p class="mb-1">Total Campaigns Created</p>
-                            <h4 class="mb-0 text-tiffany">0</h4>
+                            <h4 class="mb-0 text-tiffany" id="total-campaigns-created"></h4>
                         </div>
                     </div>
                 </div>
@@ -44,7 +44,7 @@
                     <div class="d-flex align-items-center">
                         <div class="">
                             <p class="mb-1">Total Campaigns Sent</p>
-                            <h4 class="mb-0 text-success">0</h4>
+                            <h4 class="mb-0 text-success" id="total-campaigns-sent"></h4>
                         </div>
                     </div>
                 </div>
@@ -56,7 +56,7 @@
                     <div class="d-flex align-items-center">
                         <div class="">
                             <p class="mb-1">Total Emails Sent</p>
-                            <h4 class="mb-0 text-orange">0</h4>
+                            <h4 class="mb-0 text-orange" id="total-emails-sent"></h4>
                         </div>
                     </div>
                 </div>
@@ -67,8 +67,8 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="">
-                            <p class="mb-1">Total Email Addresses</p>
-                            <h4 class="mb-0 text-pink">0</h4>
+                            <p class="mb-1">Total Emails Sent Today</p>
+                            <h4 class="mb-0 text-pink" id="total-emails-sent-today"></h4>
                         </div>
                     </div>
                 </div>
@@ -129,10 +129,30 @@
         var campaigns;
 
         $(document).ready(function() {
+            loadCampaignStatistic();
             loadCampaigns();
             loadManageEmailSenders();
             loadModifyCampaignView({ id: 0 });
         });
+
+        function loadCampaignStatistic() {
+            $.ajax({
+                url: `@Url.Action("GetRedisValue", "Campaign")?websiteId=${localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE')}`,
+                type: 'get',
+                success: (result) => {
+                    if (!result.isSuccessful) {
+                        toastr_call('error', 'Error', result.message);
+                    }
+                    else {
+                        var obj = result.data;
+                        $('#total-campaigns-created').html(obj.totalCreated);
+                        $('#total-campaigns-sent').html(obj.totalSent);
+                        $('#total-emails-sent').html(obj.totalEmailsSent);
+                        $('#total-emails-sent-today').html(obj.totalEmailsSentToday);
+                    }
+                }
+            })
+        }
 
         function loadCampaigns() {
             var timezone = encodeURIComponent('@Html.Raw(TempData["timezone"])');
@@ -234,7 +254,7 @@
                         }
                         else {
                             return `<div style="display:flex">
-                                        <a class="btn btn-primary" onclick="editCampaign(${row.id})" data-bs-toggle="modal" data-bs-target="#remove-campaign-modal" style="margin-right: 10px">
+                                        <a class="btn btn-primary" onclick="editCampaign(${row.id})" style="margin-right: 10px">
                                             <i class="bi bi-eye-fill" style="margin: 0"></i></a>
                                     </div>`
                         }
@@ -319,6 +339,7 @@
                     else {
                         var campaign = result.data;
                         campaign.isDeleted = true;
+                        campaign.sendDate = '9999-12-31 23:59';
                         setTimeout(function() {
                             $.ajax({
                                 url: `@Url.Action("UpdateCampaign", "Campaign")`,
@@ -344,6 +365,7 @@
         $('#choose-websites').change(function () {
             loadCampaigns();
             loadManageEmailSenders();
+            loadCampaignStatistic();
         });
     </script>
 }

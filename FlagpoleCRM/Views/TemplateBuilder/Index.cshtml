@@ -52,6 +52,10 @@
                         <input type="text" class="form-control" value="" id="template-name">
                     </div>
                     <div class="col-12">
+                        <label class="form-label">Subject</label>
+                        <input type="text" class="form-control" value="" id="template-subject">
+                    </div>
+                    <div class="col-12">
                         <label class="form-label">Description</label>
                         <input type="text" class="form-control" value="" id="template-description">
                     </div>
@@ -211,6 +215,7 @@
             var id = $('#template-id').val();
             var name = $('#template-name').val();
             var description = $('#template-description').val();
+            var subject = $('#template-subject').val();
             var type = $('#template-type').val();
             var websiteGuid = localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE');
             var content = editor.getData();
@@ -220,7 +225,7 @@
             }
             else {
                 $('.loading').css('display', 'block');
-                updateTemplate(id, name, description, type, websiteGuid, content, isDeleted);
+                updateTemplate(id, name, description, type, websiteGuid, content, isDeleted, subject);
             }
         });
 
@@ -237,6 +242,7 @@
                         $('#template-id').val(template.id);
                         $('#template-name').val(template.name);
                         $('#template-description').val(template.description);
+                        $('#template-subject').val(template.subject);
                         editor.setData(`${template.content}`);
                     }
                 }
@@ -264,22 +270,23 @@
                         var id = template.id;
                         var name = template.name;
                         var description = template.description;
+                        var subject = template.subject;
                         var type = template.type;
                         var websiteGuid = localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE');
                         var content = template.content;
                         var isDeleted = true;
-                        updateTemplate(id, name, description, type, websiteGuid, content, isDeleted);
+                        updateTemplate(id, name, description, type, websiteGuid, content, isDeleted, subject);
                         $('#remove-template-modal').modal('toggle');
                     }
                 }
             })
         })
 
-        function updateTemplate(id, name, description, type, websiteGuid, content, isDeleted) {
+        function updateTemplate(id, name, description, type, websiteGuid, content, isDeleted, subject) {
             $.ajax({
                 url: `@Url.Action("InsertOrUpdate", "TemplateBuilder")`,
                 type: 'post',
-                data: { id, name, description, type, websiteGuid, content, isDeleted },
+                data: { id, name, description, type, websiteGuid, content, isDeleted, subject },
                 success: (result) => {
                     if (!result.isSuccessful) {
                         toastr_call('error', 'Error', result.message);
@@ -298,6 +305,7 @@
             $('#template-id').val('');
             $('#template-name').val('');
             $('#template-description').val('');
+            $('#template-subject').val('');
             editor.setData(``);
         }
 

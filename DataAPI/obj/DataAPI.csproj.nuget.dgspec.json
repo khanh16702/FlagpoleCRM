@@ -141,6 +141,9 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
+              "D:\\GitHubCode\\FlagpoleCRM\\Common\\Common.csproj": {
+                "projectPath": "D:\\GitHubCode\\FlagpoleCRM\\Common\\Common.csproj"
+              },
               "D:\\GitHubCode\\FlagpoleCRM\\DataServiceLib\\DataServiceLib.csproj": {
                 "projectPath": "D:\\GitHubCode\\FlagpoleCRM\\DataServiceLib\\DataServiceLib.csproj"
               },
