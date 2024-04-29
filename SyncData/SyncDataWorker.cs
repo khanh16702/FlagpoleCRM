@@ -5,8 +5,10 @@ using DataServiceLib;
 using FlagpoleCRM.Models;
 using Newtonsoft.Json;
 using RestSharp;
+using StackExchange.Redis;
 using System.Diagnostics;
 using System.Net.WebSockets;
+using Order = Common.Models.Order;
 
 namespace SyncData
 {
@@ -15,12 +17,19 @@ namespace SyncData
         private readonly ILogger<SyncDataWorker> _logger;
         private readonly IConfiguration _configuration;
         private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IConnectionMultiplexer _connectionMultiplexer;
+        private IDatabase _redisDb;
 
-        public SyncDataWorker(ILogger<SyncDataWorker> logger, IConfiguration configuration, IServiceScopeFactory scopeFactory)
+        public SyncDataWorker(ILogger<SyncDataWorker> logger, 
+            IConfiguration configuration, 
+            IServiceScopeFactory scopeFactory,
+            IConnectionMultiplexer connectionMultiplexer)
         {
             _logger = logger;
             _configuration = configuration;
             _scopeFactory = scopeFactory;
+            _connectionMultiplexer = connectionMultiplexer;
+            _redisDb = _connectionMultiplexer.GetDatabase(0);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -40,6 +49,8 @@ namespace SyncData
 
                     Parallel.ForEach(websites, new ParallelOptions { MaxDegreeOfParallelism = 3 }, website =>
                     {
+                        _redisDb.StringSet(RedisKeyPrefix.REPORT_TOTAL_ORDERS + website.Guid + ":All", 0);
+                        _redisDb.StringSet(RedisKeyPrefix.REPORT_TOTAL_REVENUE + website.Guid + ":All", 0);
                         SyncData(website, "orders", _mongoOrder, _mongoCustomerRaw);
                         SyncData(website, "customers", _mongoOrder, _mongoCustomerRaw);
                     });
@@ -47,6 +58,7 @@ namespace SyncData
                     // For debug
                     //foreach (var website in websites)
                     //{
+                    //    _redisDb.StringSet(RedisKeyPrefix.REPORT_TOTAL_ORDERS + website.Guid + ":All", 0);
                     //    SyncData(website, "orders", _mongoOrder, _mongoCustomerRaw);
                     //    SyncData(website, "customers", _mongoOrder, _mongoCustomerRaw);
                     //}
@@ -64,6 +76,8 @@ namespace SyncData
             MongoDbHelper<Order> _mongoOrder, 
             MongoDbHelper<CustomerRaw> _mongoCustomerRaw)
         {
+            List<string> orderDates = new List<string>();
+
             long sinceId = 0;
             bool isStop = false;
 
@@ -82,7 +96,7 @@ namespace SyncData
                     switch (collection)
                     {
                         case "orders":
-                            ProcessOrders(response, _mongoOrder, website, DataSource.SHOPIFY, ref sinceId, ref isStop);
+                            ProcessOrders(response, _mongoOrder, website, DataSource.SHOPIFY, ref sinceId, ref isStop, ref orderDates);
                             break;
                         case "customers":
                             ProcessCustomers(response, _mongoOrder, _mongoCustomerRaw, website, DataSource.SHOPIFY, ref sinceId, ref isStop);
@@ -110,7 +124,7 @@ namespace SyncData
                     switch (collection)
                     {
                         case "orders":
-                            ProcessOrders(response, _mongoOrder, website, DataSource.HARAVAN, ref sinceId, ref isStop);
+                            ProcessOrders(response, _mongoOrder, website, DataSource.HARAVAN, ref sinceId, ref isStop, ref orderDates);
                             break;
                         case "customers":
                             ProcessCustomers(response, _mongoOrder, _mongoCustomerRaw, website, DataSource.HARAVAN, ref sinceId, ref isStop);
@@ -126,14 +140,20 @@ namespace SyncData
             Website website, 
             string source,
             ref long sinceId,
-            ref bool isStop)
+            ref bool isStop,
+            ref List<string> orderDates)
         {
             try
             {
                 _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Process orders from WebsiteId {website.Guid}");
                 var orders = JsonConvert.DeserializeObject<OrderResult>(response.Content).Orders;
 
-                if (orders.Count == 0)
+                var orderKey = RedisKeyPrefix.REPORT_TOTAL_ORDERS + website.Guid + ":All";
+                var totalOrders = int.Parse(_redisDb.StringGet(orderKey));
+                totalOrders += orders.Count;
+                _redisDb.StringSet(orderKey, totalOrders);
+
+                if (!orders.Any())
                 {
                     isStop = true;
                     return;
@@ -142,6 +162,27 @@ namespace SyncData
                 int index = 0;
                 foreach (OrderRaw order in orders)
                 {
+                    if (order.CancelledAt == null)
+                    {
+                        var revenueKey = RedisKeyPrefix.REPORT_TOTAL_REVENUE + website.Guid + ":All";
+                        var totalRevenue = double.Parse(_redisDb.StringGet(revenueKey));
+                        totalRevenue += order.TotalPrice;
+                        _redisDb.StringSet(revenueKey, totalRevenue);
+
+                        var createdDate = order.CreatedAt.ToString("dd/MM/yyyy");
+                        var orderRevenueKey = RedisKeyPrefix.REPORT_TOTAL_REVENUE + website.Guid + ":" + createdDate;
+                        if (!orderDates.Contains(createdDate))
+                        {
+                            orderDates.Add(createdDate);
+                            _redisDb.StringSet(orderRevenueKey, order.TotalPrice);
+                        }
+                        else
+                        {
+                            var orderRevenue = double.Parse(_redisDb.StringGet(orderRevenueKey));
+                            orderRevenue += order.TotalPrice;
+                            _redisDb.StringSet(orderRevenueKey, orderRevenue);
+                        }
+                    }
                     if (index == orders.Count - 1)
                     {
                         sinceId = order.OrgId;

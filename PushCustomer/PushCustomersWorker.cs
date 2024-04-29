@@ -8,6 +8,10 @@ using System.Diagnostics;
 using PushCustomers.Helper;
 using FlagpoleCRM.Models;
 using FlagpoleCRM.DTO;
+using StackExchange.Redis;
+using Common.Constant;
+using Common.Enums;
+using EnumsNET;
 
 namespace PushCustomers
 {
@@ -16,12 +20,19 @@ namespace PushCustomers
         private readonly ILogger<PushCustomersWorker> _logger;
         private readonly IConfiguration _configuration;
         private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IConnectionMultiplexer _connectionMultiplexer;
+        private IDatabase _redisDb;
 
-        public PushCustomersWorker(ILogger<PushCustomersWorker> logger, IConfiguration configuration, IServiceScopeFactory scopeFactory)
+        public PushCustomersWorker(ILogger<PushCustomersWorker> logger, 
+            IConfiguration configuration, 
+            IServiceScopeFactory scopeFactory,
+            IConnectionMultiplexer connectionMultiplexer)
         {
             _logger = logger;
             _configuration = configuration;
             _scopeFactory = scopeFactory;
+            _connectionMultiplexer = connectionMultiplexer;
+            _redisDb = _connectionMultiplexer.GetDatabase(0);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -41,50 +52,60 @@ namespace PushCustomers
                 bool isRescanAudience = false;  // if Customer index of Elasticsearch changed, Audience table in SQLServer must be rescanned
                 if (_mongoCustomerRaw.CountDocumentsAsync().Result > 0)
                 {
-                    var customers = _mongoCustomerRaw.Find(x => x.IsSyncCustomer == false).Result.ToList();
-                    foreach (CustomerRaw customer in customers)
+                    using (var scope = _scopeFactory.CreateScope())
                     {
-                        _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Push customer {customer.Id}");
-                        var matchedCustomer =
-                            _mongoCustomer.Find(x => x.Contacts.Any(x => (!string.IsNullOrEmpty(x.Email) && x.Email == customer.Email)
-                            || (!string.IsNullOrEmpty(x.Phone) && x.Phone == customer.Phone)
-                            || (customer.Addresses != null && customer.Addresses.Any(y => (!string.IsNullOrEmpty(y.Phone) && y.Phone == x.Phone)))))
-                            .Result.FirstOrDefault();
-
-                        if (matchedCustomer != null)
+                        var websiteService = scope.ServiceProvider.GetRequiredService<IWebsiteService>();
+                        var allWebsites = websiteService.GetAllWebsites();
+                        foreach(Website website in allWebsites)
                         {
-                            var response = SyncCustomerService.UpdateCustomer(matchedCustomer, customer, _mongoCustomer);
-                            if (!response.IsSuccessful)
+                            _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Processing customers in WebsiteId = {website.Guid}");
+                            var customers = _mongoCustomerRaw.Find(x => x.WebsiteId == website.Guid.Replace("-", "") && !x.IsSyncCustomer).Result.ToList();
+                            foreach (CustomerRaw customer in customers)
                             {
-                                _logger.LogError($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Error while pushing customer {customer.Id}: {response.Message}");
+                                _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Push customer {customer.Id}");
+                                var matchedCustomer =
+                                    _mongoCustomer.Find(x => x.Contacts.Any(x => (!string.IsNullOrEmpty(x.Email) && x.Email == customer.Email)
+                                    || (!string.IsNullOrEmpty(x.Phone) && x.Phone == customer.Phone)
+                                    || (customer.Addresses != null && customer.Addresses.Any(y => (!string.IsNullOrEmpty(y.Phone) && y.Phone == x.Phone)))))
+                                    .Result.FirstOrDefault();
+
+                                if (matchedCustomer != null)
+                                {
+                                    var response = SyncCustomerService.UpdateCustomer(matchedCustomer, customer, _mongoCustomer);
+                                    if (!response.IsSuccessful)
+                                    {
+                                        _logger.LogError($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Error while pushing customer {customer.Id}: {response.Message}");
+                                    }
+                                    else
+                                    {
+                                        customer.IsSyncCustomer = true;
+                                        _mongoCustomerRaw.Update(customer.ObjId, customer);
+                                    }
+                                }
+                                else
+                                {
+                                    var response = SyncCustomerService.InsertCustomer(customer, _mongoCustomer);
+                                    if (!response.IsSuccessful)
+                                    {
+                                        _logger.LogError($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Error while pushing customer {customer.Id}: {response.Message}");
+                                    }
+                                    else
+                                    {
+                                        customer.IsSyncCustomer = true;
+                                        _mongoCustomerRaw.Update(customer.ObjId, customer);
+                                    }
+                                }
                             }
-                            else
+
+                            // Calculate RFM and push to Elasticsearch
+                            if (customers.Any())
                             {
-                                customer.IsSyncCustomer = true;
-                                _mongoCustomerRaw.Update(customer.ObjId, customer);
+                                isRescanAudience = true;
+                                ResetRFMRedis(website.Guid);
+                                _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Start calculate RFM");
+                                RFMHelper.CalculateRFM(_mongoCustomer, _logger, client, website.Guid, _redisDb);
                             }
                         }
-                        else
-                        {
-                            var response = SyncCustomerService.InsertCustomer(customer, _mongoCustomer);
-                            if (!response.IsSuccessful)
-                            {
-                                _logger.LogError($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Error while pushing customer {customer.Id}: {response.Message}");
-                            }
-                            else
-                            {
-                                customer.IsSyncCustomer = true;
-                                _mongoCustomerRaw.Update(customer.ObjId, customer);
-                            }
-                        }
-                    }
-
-                    // Calculate RFM and push to Elasticsearch
-                    if (customers.Any())
-                    {
-                        isRescanAudience = true;
-                        _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Start calculate RFM");
-                        RFMHelper.CalculateRFM(_mongoCustomer, _logger, client);
                     }
                 }
 
@@ -122,6 +143,17 @@ namespace PushCustomers
                 await Task.Delay(30000, stoppingToken);
             }
             _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Stop push customers");
+        }
+
+        private void ResetRFMRedis(string websiteId)
+        {
+            var rfmKeyPrefix = RedisKeyPrefix.REPORT_RFM + websiteId + ":";
+            var rfms = Enum.GetValues(typeof(ERFM));
+            foreach(var rfm in rfms)
+            {
+                var key = rfmKeyPrefix + rfm;
+                _redisDb.StringSet(key, 0);
+            }
         }
 
     }

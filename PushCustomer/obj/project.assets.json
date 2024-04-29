@@ -13281,6 +13281,7 @@
     "net6.0": [
       "Common >= 1.0.0",
       "DataServiceLib >= 1.0.0",
+      "Enums.NET >= 4.0.2",
       "Microsoft.Extensions.Hosting >= 6.0.1"
     ]
   },
@@ -13338,6 +13339,10 @@
       "net6.0": {
         "targetAlias": "net6.0",
         "dependencies": {
+          "Enums.NET": {
+            "target": "Package",
+            "version": "[4.0.2, )"
+          },
           "Microsoft.Extensions.Hosting": {
             "target": "Package",
             "version": "[6.0.1, )"

@@ -3,6 +3,7 @@ using FlagpoleCRM.Models;
 using log4net;
 using Microsoft.EntityFrameworkCore;
 using PushCustomers;
+using StackExchange.Redis;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
@@ -15,6 +16,10 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<ILog>(_ => LogManager.GetLogger(typeof(WebsiteService)));
         services.AddTransient<IWebsiteService, WebsiteService>();
         services.AddTransient<ICustomerService, CustomerService>();
+        services.AddSingleton<IConnectionMultiplexer>(options => ConnectionMultiplexer.Connect(new ConfigurationOptions
+        {
+            EndPoints = { $"{configuration["RedisConnection:Host"]}:{configuration["RedisConnection:Port"]}" }
+        }));
         services.AddHostedService<PushCustomersWorker>();
     })
     .Build();

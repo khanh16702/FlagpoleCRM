@@ -14,7 +14,7 @@
                     <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
                         <div>
                             <p>Total Orders</p>
-                            <h4></h4>
+                            <h4 id="report-total-orders"></h4>
                         </div>
                     </div>
                 </div>
@@ -26,7 +26,7 @@
                     <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
                         <div>
                             <p>Total Campaigns</p>
-                            <h4 class="">12.5M</h4>
+                            <h4 id="report-total-campaigns"></h4>
                         </div>
                     </div>
                 </div>
@@ -38,7 +38,7 @@
                     <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
                         <div>
                             <p>Total Revenue</p>
-                            <h4></h4>
+                            <h4 id="report-total-revenue"></h4>
                         </div>
                     </div>
                 </div>
@@ -50,7 +50,7 @@
                     <div class="d-flex align-items-stretch justify-content-between overflow-hidden">
                         <div>
                             <p>Total Customers</p>
-                            <h4></h4>
+                            <h4 id="report-total-customers"></h4>
                         </div>
                     </div>
                 </div>
@@ -61,44 +61,108 @@
         <div class="col-12 col-lg-6 d-flex">
             <div class="card radius-10 w-100">
                 <div class="card-body">
-                    <div id="chart5"></div>
+                    <div id="emails-sent-chart"></div>
                 </div>
             </div>
         </div>
         <div class="col-12 col-lg-6 d-flex">
             <div class="card radius-10 w-100">
                 <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <h6 class="mb-0">RFM</h6>
-                    </div>
-                    <div class="row row-cols-1 row-cols-md-2 g-3 mt-2 align-items-center">
-                        <div class="col-lg-7 col-xl-7 col-xxl-8">
-                            <div class="by-device-container">
-                                <div class="piechart-legend">
-                                    <h2 class="mb-1">85%</h2>
-                                    <h6 class="mb-0">Total Visitors</h6>
-                                </div>
-                                <canvas id="chart6"></canvas>
-                            </div>
-                        </div>
-                        <div class="col-lg-5 col-xl-5 col-xxl-4">
-                            <div class="">
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item d-flex align-items-center justify-content-between border-0">
-                                        <i class="bi bi-tablet-landscape-fill me-2 text-primary"></i> <span>Tablet - </span> <span>22.5%</span>
-                                    </li>
-                                    <li class="list-group-item d-flex align-items-center justify-content-between border-0">
-                                        <i class="bi bi-phone-fill me-2 text-primary-2"></i> <span>Mobile - </span> <span>62.3%</span>
-                                    </li>
-                                    <li class="list-group-item d-flex align-items-center justify-content-between border-0">
-                                        <i class="bi bi-display-fill me-2 text-primary-3"></i> <span>Desktop - </span> <span>15.2%</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+                    <div id="rfm-piechart"></div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-lg-12 d-flex">
+            <div class="card-body">
+                <div id="revenue-chart"></div>
+            </div>
+        </div>
+    </div>
 </main>
+
+@section Script {
+    <script src="/js/report/rfm-chart.js"></script>
+    <script src="/js/report/revenue.js"></script>
+    <script src="/js/report/emails-sent.js"></script>
+    <script>
+        $.ajax({
+            url: `@Url.Action("GetTotalCustomers", "Report")?websiteId=${localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE')}`,
+            type: 'get',
+            success: (result) => {
+                if (result == -1) {
+                    toastr_call('error', 'Error', 'Some errors occurred');
+                }
+                else {
+                    $('#report-total-customers').html(result);
+                }
+            }
+        });
+
+        $.ajax({
+            url: `@Url.Action("GetTotalOrders", "Report")?websiteId=${localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE')}`,
+            type: 'get',
+            success: (result) => {
+                if (result == -1) {
+                    toastr_call('error', 'Error', 'Some errors occurred');
+                }
+                else {
+                    $('#report-total-orders').html(result);
+                }
+            }
+        });
+
+        $.ajax({
+            url: `@Url.Action("GetRedisValue", "Campaign")?websiteId=${localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE')}`,
+            type: 'get',
+            success: (result) => {
+                if (!result.isSuccessful) {
+                    toastr_call('error', 'Error', result.message);
+                }
+                else {
+                    var obj = result.data;
+                    $('#report-total-campaigns').html(obj.totalCreated);
+                }
+            }
+        })
+
+        $.ajax({
+            url: `@Url.Action("GetTotalRevenue", "Report")?websiteId=${localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE')}`,
+            type: 'get',
+            success: (result) => {
+                if (result == -1) {
+                    toastr_call('error', 'Error', 'Some errors occurred');
+                }
+                else {
+                    $('#report-total-revenue').html(result);
+                }
+            }
+        });
+
+        $.ajax({
+            url: `@Url.Action("GetRFMScores", "Report")?websiteId=${localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE')}`,
+            type: 'get',
+            success: (result) => {
+                loadPieChart(result);
+            }
+        })
+
+        $.ajax({
+            url: `@Url.Action("GetRevenue", "Report")?websiteId=${localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE')}`,
+            type: 'get',
+            success: (result) => {
+                loadRevenueChart(result);
+            }
+        })
+
+        $.ajax({
+            url: `@Url.Action("GetEmailsSent", "Report")?websiteId=${localStorage.getItem('@Common.Constant.CookiesName.CURRENT_WEBSITE')}`,
+            type: 'get',
+            success: (result) => {
+                loadEmailsSentChart(result);
+            }
+        })
+    </script>
+}

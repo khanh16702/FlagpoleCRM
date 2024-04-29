@@ -1,21 +1,27 @@
-﻿using Common.Enums;
+﻿using Common.Constant;
+using Common.Enums;
 using Common.Helper;
 using Common.Models;
 using PushCustomers.Utilize;
 using RestSharp;
 using RestSharp.Authenticators;
+using StackExchange.Redis;
 
 namespace PushCustomers.Helper
 {
     public class RFMHelper
     {
-        public static void CalculateRFM(MongoDbHelper<Customer> _mongoDbCustomer, ILogger<PushCustomersWorker> _logger, RestClient client)
+        public static void CalculateRFM(MongoDbHelper<Customer> _mongoDbCustomer, 
+            ILogger<PushCustomersWorker> _logger, 
+            RestClient client,
+            string websiteId,
+            IDatabase _redisDb)
         {
             try
             {
                 _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Calculating RFM quintiles");
 
-                var customers = _mongoDbCustomer.Find(x => x.RFM != null).Result.ToList();
+                var customers = _mongoDbCustomer.Find(x => x.RFM != null && x.WebsiteId == websiteId.Replace("-", "")).Result.ToList();
 
                 var rvalueList = customers.OrderByDescending(x => x.RFM.RValue).Select(x => x.RFM.RValue).ToList();
                 var rvalQuintile = CalculateQuintile(rvalueList);
@@ -35,6 +41,10 @@ namespace PushCustomers.Helper
                     customer.RFM.RFMScore = customer.RFM.RScore * 100 + customer.RFM.FScore * 10 + customer.RFM.MScore;
                     customer.RFM.RFMGroup = GetRFMGroup(customer.RFM.RFMScore);
                     customer.ModifiedDate = DateTime.Now;
+                    var redisKey = RedisKeyPrefix.REPORT_RFM + websiteId + ":" + Enum.GetName(typeof(ERFM), customer.RFM.RFMGroup);
+                    var number = int.Parse(_redisDb.StringGet(redisKey));
+                    _redisDb.StringSet(redisKey, ++number);
+
                     _mongoDbCustomer.Update(customer.Id, customer);
 
                     _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Pushing to Elasticsearch customer {customer.Id}");
@@ -100,7 +110,8 @@ namespace PushCustomers.Helper
             if (atRisk.Contains(score)) return (int)ERFM.AtRisk;
             if (cantLoseThem.Contains(score)) return (int)ERFM.CantLoseThem;
             if (hibernating.Contains(score)) return (int)ERFM.Hibernating;
-            else return (int)ERFM.Lost;
+            if (lost.Contains(score)) return (int)ERFM.Lost;
+            else return -1;
         }
     }
 }
