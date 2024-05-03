@@ -59,6 +59,7 @@ namespace SyncData
                     //foreach (var website in websites)
                     //{
                     //    _redisDb.StringSet(RedisKeyPrefix.REPORT_TOTAL_ORDERS + website.Guid + ":All", 0);
+                    //    _redisDb.StringSet(RedisKeyPrefix.REPORT_TOTAL_REVENUE + website.Guid + ":All", 0);
                     //    SyncData(website, "orders", _mongoOrder, _mongoCustomerRaw);
                     //    SyncData(website, "customers", _mongoOrder, _mongoCustomerRaw);
                     //}
@@ -195,6 +196,7 @@ namespace SyncData
                     if (matchOrder == null)
                     {
                         var syncResult = SyncOrdersService.Insert(order, website.Guid, source, _mongoOrder);
+                        _redisDb.StringSet(RedisKeyPrefix.REPORT_RFM_RECALCULATE + website.Guid, "true");
                         if (!syncResult.IsSuccessful)
                         {
                             _logger.LogError($"Website {website.Id}: Error when trying to sync {source} orders: " + syncResult.Message);

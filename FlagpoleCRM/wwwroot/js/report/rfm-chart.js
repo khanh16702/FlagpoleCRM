@@ -18,31 +18,20 @@
             }
         },
         subtitle: {},
+        legend: {
+            itemStyle: {
+                color: '#fff',
+                fontWeight: 'normal'
+            }
+        },
         plotOptions: {
-            series: {
+            pie: {
                 allowPointSelect: true,
                 cursor: 'pointer',
-                dataLabels: [{
-                    enabled: true,
-                    distance: 20,
-                    style: {
-                        color: '#ffffff'
-                    }
-                }, {
-                    enabled: true,
-                    distance: -40,
-                    format: '{point.percentage:.1f}%',
-                    style: {
-                        fontSize: '1.2em',
-                        textOutline: 'none',
-                        opacity: 1
-                    },
-                    filter: {
-                        operator: '>',
-                        property: 'percentage',
-                        value: 10
-                    }
-                }]
+                dataLabels: {
+                    enabled: false
+                },
+                showInLegend: true,
             }
         },
         series: [

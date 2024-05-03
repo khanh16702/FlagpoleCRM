@@ -105,6 +105,17 @@ namespace PushCustomers
                                 _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Start calculate RFM");
                                 RFMHelper.CalculateRFM(_mongoCustomer, _logger, client, website.Guid, _redisDb);
                             }
+                            else
+                            {
+                                var rfmRecalKey = RedisKeyPrefix.REPORT_RFM_RECALCULATE + website.Guid;
+                                if (_redisDb.StringGet(rfmRecalKey).ToString() == "true")
+                                {
+                                    ResetRFMRedis(website.Guid);
+                                    _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Start calculate RFM");
+                                    RFMHelper.CalculateRFM(_mongoCustomer, _logger, client, website.Guid, _redisDb);
+                                    _redisDb.StringSet(rfmRecalKey, "false");
+                                }
+                            }
                         }
                     }
                 }

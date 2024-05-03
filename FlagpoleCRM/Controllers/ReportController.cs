@@ -162,11 +162,11 @@ namespace FlagpoleCRM.Controllers
                 {
                     rfmCustomers += rfms[i];
                     var name = ((ERFM)(i + 1)).AsString(EnumFormat.Description);
-                    var y = Math.Round((double)rfms[i] / totalCustomers, 2);
+                    var y = Math.Round((double)rfms[i] / totalCustomers * 100, 2);
                     lst.Add(new { name, y });
                 }
                 var otherName = "Other";
-                var otherValue = Math.Round((double)(totalCustomers - rfmCustomers) / totalCustomers, 2);
+                var otherValue = Math.Round((double)(totalCustomers - rfmCustomers) / totalCustomers * 100, 2);
                 lst.Add(new
                 {
                     name = otherName,

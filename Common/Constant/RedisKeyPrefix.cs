@@ -17,5 +17,6 @@ namespace Common.Constant
         public const string REPORT_TOTAL_ORDERS = "Report:TotalOrders:";
         public const string REPORT_TOTAL_REVENUE = "Report:TotalRevenue:";
         public const string REPORT_RFM = "Report:RFM:";
+        public const string REPORT_RFM_RECALCULATE = "Report:RFMRecalculate:";
     }
 }
