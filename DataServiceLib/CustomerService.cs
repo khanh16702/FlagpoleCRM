@@ -110,6 +110,14 @@ namespace DataServiceLib
                 var audience = _flagpoleCRM.Audiences.FirstOrDefault(x => x.Id == id);
                 audience.IsDeleted = true;
                 _flagpoleCRM.Audiences.Update(audience);
+
+                var audienceCustomers = _flagpoleCRM.AudienceCustomers.Where(x => x.AudienceId == id).ToList();
+                foreach(AudienceCustomer audienceCustomer in audienceCustomers)
+                {
+                    audienceCustomer.IsDeleted = true;
+                    _flagpoleCRM.AudienceCustomers.Update(audienceCustomer);
+                }
+
                 _flagpoleCRM.SaveChanges();
             }
             catch(Exception ex)

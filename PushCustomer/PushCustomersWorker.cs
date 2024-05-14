@@ -151,7 +151,7 @@ namespace PushCustomers
                     }
                 }
                 timer.Reset();
-                await Task.Delay(30000, stoppingToken);
+                await Task.Delay(3000, stoppingToken);
             }
             _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Stop push customers");
         }
