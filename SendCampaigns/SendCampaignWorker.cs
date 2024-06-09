@@ -75,6 +75,10 @@ namespace SendCampaigns
                         {
                             var sender = campaignService.GetEmailSenderById(campaign.EmailId.Value);
                             var template = templateService.GetTemplateById(campaign.TemplateId.Value);
+                            if (template == null)
+                            {
+                                continue;
+                            }
                             var content = template.Content;
                             
                             int take = 10000, skip = 0;
