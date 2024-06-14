@@ -67,7 +67,7 @@ namespace SyncData
                 timer.Stop();
                 _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Sync data done in {timer.Elapsed.ToString(@"hh\:mm\:ss\.ffff")}");
                 timer.Reset();
-                await Task.Delay(21600000, stoppingToken);
+                await Task.Delay(216000, stoppingToken);
             }
             _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Stop sync data from ecommerce");
         }
@@ -108,9 +108,6 @@ namespace SyncData
 
             if (!string.IsNullOrEmpty(website.HaravanToken))
             {
-                // "sinceId" will not be used in Haravan
-                // Haravan uses "page" instead
-
                 isStop = false;
                 int page = 1;
                 _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Sync data from Haravan");

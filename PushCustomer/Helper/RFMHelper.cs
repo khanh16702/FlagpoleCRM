@@ -23,35 +23,38 @@ namespace PushCustomers.Helper
 
                 var customers = _mongoDbCustomer.Find(x => x.RFM != null && x.WebsiteId == websiteId.Replace("-", "")).Result.ToList();
 
-                var rvalueList = customers.OrderByDescending(x => x.RFM.RValue).Select(x => x.RFM.RValue).ToList();
-                var rvalQuintile = CalculateQuintile(rvalueList);
-
-                var fvalueList = customers.OrderBy(x => x.RFM.FValue).Select(x => x.RFM.FValue).ToList();
-                var fvalQuintile = CalculateQuintile(fvalueList);
-
-                var mvalueList = customers.OrderBy(x => x.RFM.MValue).Select(x => x.RFM.MValue).ToList();
-                var mvalQuintile = CalculateQuintile(mvalueList);
-
-                foreach (Customer customer in customers)
+                if (customers.Any())
                 {
-                    _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Calculating RFM of customer {customer.Id}");
-                    customer.RFM.RScore = CalculateRFMScore(customer.RFM.RValue, rvalQuintile);
-                    customer.RFM.FScore = CalculateRFMScore(customer.RFM.FValue, fvalQuintile);
-                    customer.RFM.MScore = CalculateRFMScore(customer.RFM.MValue, mvalQuintile);
-                    customer.RFM.RFMScore = customer.RFM.RScore * 100 + customer.RFM.FScore * 10 + customer.RFM.MScore;
-                    customer.RFM.RFMGroup = GetRFMGroup(customer.RFM.RFMScore);
-                    customer.ModifiedDate = DateTime.Now;
-                    var redisKey = RedisKeyPrefix.REPORT_RFM + websiteId + ":" + Enum.GetName(typeof(ERFM), customer.RFM.RFMGroup);
-                    var number = int.Parse(_redisDb.StringGet(redisKey));
-                    _redisDb.StringSet(redisKey, ++number);
+                    var rvalueList = customers.OrderByDescending(x => x.RFM.RValue).Select(x => x.RFM.RValue).ToList();
+                    var rvalQuintile = CalculateQuintile(rvalueList);
 
-                    _mongoDbCustomer.Update(customer.Id, customer);
+                    var fvalueList = customers.OrderBy(x => x.RFM.FValue).Select(x => x.RFM.FValue).ToList();
+                    var fvalQuintile = CalculateQuintile(fvalueList);
 
-                    _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Pushing to Elasticsearch customer {customer.Id}");
-                    PushToElastic.PushCustomer(customer, _logger, client);
+                    var mvalueList = customers.OrderBy(x => x.RFM.MValue).Select(x => x.RFM.MValue).ToList();
+                    var mvalQuintile = CalculateQuintile(mvalueList);
+
+                    foreach (Customer customer in customers)
+                    {
+                        _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Calculating RFM of customer {customer.Id}");
+                        customer.RFM.RScore = CalculateRFMScore(customer.RFM.RValue, rvalQuintile);
+                        customer.RFM.FScore = CalculateRFMScore(customer.RFM.FValue, fvalQuintile);
+                        customer.RFM.MScore = CalculateRFMScore(customer.RFM.MValue, mvalQuintile);
+                        customer.RFM.RFMScore = customer.RFM.RScore * 100 + customer.RFM.FScore * 10 + customer.RFM.MScore;
+                        customer.RFM.RFMGroup = GetRFMGroup(customer.RFM.RFMScore);
+                        customer.ModifiedDate = DateTime.Now;
+                        var redisKey = RedisKeyPrefix.REPORT_RFM + websiteId + ":" + Enum.GetName(typeof(ERFM), customer.RFM.RFMGroup);
+                        var number = int.Parse(_redisDb.StringGet(redisKey));
+                        _redisDb.StringSet(redisKey, ++number);
+
+                        _mongoDbCustomer.Update(customer.Id, customer);
+
+                        _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Pushing to Elasticsearch customer {customer.Id}");
+                        PushToElastic.PushCustomer(customer, _logger, client);
+                    }
                 }
 
-                var restCustomers = _mongoDbCustomer.Find(x => x.RFM == null).Result.ToList();
+                var restCustomers = _mongoDbCustomer.Find(x => x.RFM == null && x.WebsiteId == websiteId.Replace("-", "")).Result.ToList();
                 foreach(Customer restCustomer in restCustomers)
                 {
                     _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Pushing to Elasticsearch customer {restCustomer.Id}");

@@ -136,11 +136,23 @@ namespace DataServiceLib
                     matchedCustomer.ChannelSubscribes.Add((int)EChannelSubscribe.Email);
                 }
 
-                if (customer.RFM != null && matchedCustomer.RFM != null)
+                if (customer.RFM != null)
                 {
-                    matchedCustomer.RFM.MValue += customer.RFM.MValue;
-                    matchedCustomer.RFM.FValue += customer.RFM.FValue;
-                    matchedCustomer.RFM.RValue = Math.Min(matchedCustomer.RFM.RValue, customer.RFM.RValue);
+                    if (matchedCustomer.RFM == null)
+                    {
+                        matchedCustomer.RFM = new RFM
+                        {
+                            MValue = customer.RFM.MValue,
+                            FValue = customer.RFM.FValue,
+                            RValue = customer.RFM.RValue
+                        };
+                    }
+                    else
+                    {
+                        matchedCustomer.RFM.MValue += customer.RFM.MValue;
+                        matchedCustomer.RFM.FValue += customer.RFM.FValue;
+                        matchedCustomer.RFM.RValue = Math.Min(matchedCustomer.RFM.RValue, customer.RFM.RValue);
+                    }
                 }
 
                 if (customer.Addresses != null)
