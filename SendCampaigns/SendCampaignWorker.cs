@@ -60,6 +60,12 @@ namespace SendCampaigns
                     var campaigns = campaignService.GetProcessCampaigns();
                     foreach(Campaign campaign in campaigns)
                     {
+                        var audience = customerService.GetAudienceById(campaign.AudienceId);
+                        if (audience.IsHasModification)
+                        {
+                            continue;
+                        }
+
                         _logger.LogInformation($"{DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss")}: Processing CampaignId = {campaign.Id}");
 
                         campaign.SendStatus = (int)ESendStatus.Sending;

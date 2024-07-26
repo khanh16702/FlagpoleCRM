@@ -43,6 +43,12 @@ namespace FlagpoleCRM.Controllers
 
                 var param = $"email={userInfo.Email}";
                 var findAcc = await APIHelper.SearchTemplateAsync($"/api/AccountAPI/GetAccountByEmail?{param}", _apiUrl, _superHeaderName, _superHeaderValue);
+                
+                if (findAcc == null)
+                {
+                    return Redirect("/login/authentication/index");
+                }
+
                 var currentAcc = JsonConvert.DeserializeObject<Account>(JsonConvert.SerializeObject(findAcc));
                 TempData["avatar"] = currentAcc.Avatar;
                 TempData["fullName"] = currentAcc.FullName;

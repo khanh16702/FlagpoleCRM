@@ -156,6 +156,7 @@
         var currentEmail;
 
         $(document).ready(function() {
+            localStorage.removeItem('@Common.Constant.CookiesName.CURRENT_WEBSITE');
             $.ajax({
                 url: `/login/authentication/GetWebUrl`,
                 type: 'get',
