@@ -111,6 +111,71 @@
         }
       }
     },
+    "D:\\GitHubCode\\FlagpoleCRM\\DataAccessLib\\DataAccessLib.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\GitHubCode\\FlagpoleCRM\\DataAccessLib\\DataAccessLib.csproj",
+        "projectName": "DataAccessLib",
+        "projectPath": "D:\\GitHubCode\\FlagpoleCRM\\DataAccessLib\\DataAccessLib.csproj",
+        "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
+        "outputPath": "D:\\GitHubCode\\FlagpoleCRM\\DataAccessLib\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "D:\\GitHubCode\\FlagpoleCRM\\RepositoriesLib\\RepositoriesLib.csproj": {
+                "projectPath": "D:\\GitHubCode\\FlagpoleCRM\\RepositoriesLib\\RepositoriesLib.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.100-rc.2.22477.23\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
     "D:\\GitHubCode\\FlagpoleCRM\\DataAPI\\DataAPI.csproj": {
       "version": "1.0.0",
       "restore": {
@@ -248,8 +313,14 @@
               "D:\\GitHubCode\\FlagpoleCRM\\Common\\Common.csproj": {
                 "projectPath": "D:\\GitHubCode\\FlagpoleCRM\\Common\\Common.csproj"
               },
+              "D:\\GitHubCode\\FlagpoleCRM\\DataAccessLib\\DataAccessLib.csproj": {
+                "projectPath": "D:\\GitHubCode\\FlagpoleCRM\\DataAccessLib\\DataAccessLib.csproj"
+              },
               "D:\\GitHubCode\\FlagpoleCRM\\FlagpoleCRM\\FlagpoleCRM.csproj": {
                 "projectPath": "D:\\GitHubCode\\FlagpoleCRM\\FlagpoleCRM\\FlagpoleCRM.csproj"
+              },
+              "D:\\GitHubCode\\FlagpoleCRM\\RepositoriesLib\\RepositoriesLib.csproj": {
+                "projectPath": "D:\\GitHubCode\\FlagpoleCRM\\RepositoriesLib\\RepositoriesLib.csproj"
               }
             }
           }
@@ -393,6 +464,74 @@
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
             },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.100-rc.2.22477.23\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\GitHubCode\\FlagpoleCRM\\RepositoriesLib\\RepositoriesLib.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\GitHubCode\\FlagpoleCRM\\RepositoriesLib\\RepositoriesLib.csproj",
+        "projectName": "RepositoriesLib",
+        "projectPath": "D:\\GitHubCode\\FlagpoleCRM\\RepositoriesLib\\RepositoriesLib.csproj",
+        "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
+        "outputPath": "D:\\GitHubCode\\FlagpoleCRM\\RepositoriesLib\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "D:\\GitHubCode\\FlagpoleCRM\\Common\\Common.csproj": {
+                "projectPath": "D:\\GitHubCode\\FlagpoleCRM\\Common\\Common.csproj"
+              },
+              "D:\\GitHubCode\\FlagpoleCRM\\FlagpoleCRM\\FlagpoleCRM.csproj": {
+                "projectPath": "D:\\GitHubCode\\FlagpoleCRM\\FlagpoleCRM\\FlagpoleCRM.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }

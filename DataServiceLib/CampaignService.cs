@@ -15,7 +15,6 @@ namespace DataServiceLib
         EmailAccount GetEmailSenderById (int id);
         List<EmailAccount> GetListEmailSender(string websiteId);
         ResponseModel UpdateEmailSender(EmailAccount model);
-
         Campaign GetCampaignById(int id);
         List<Campaign> GetListCampaign(string websiteId);
         List<Campaign> GetProcessCampaigns();

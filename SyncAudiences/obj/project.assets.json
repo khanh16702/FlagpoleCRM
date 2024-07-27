@@ -4932,12 +4932,27 @@
           "bin/placeholder/Common.dll": {}
         }
       },
+      "DataAccessLib/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "dependencies": {
+          "RepositoriesLib": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/DataAccessLib.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/DataAccessLib.dll": {}
+        }
+      },
       "DataServiceLib/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
           "Common": "1.0.0",
+          "DataAccessLib": "1.0.0",
           "FlagpoleCRM": "1.0.0",
+          "RepositoriesLib": "1.0.0",
           "log4net": "2.0.15"
         },
         "compile": {
@@ -4971,6 +4986,20 @@
         "frameworkReferences": [
           "Microsoft.AspNetCore.App"
         ]
+      },
+      "RepositoriesLib/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "dependencies": {
+          "Common": "1.0.0",
+          "FlagpoleCRM": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/RepositoriesLib.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/RepositoriesLib.dll": {}
+        }
       }
     }
   },
@@ -13266,6 +13295,11 @@
       "path": "../Common/Common.csproj",
       "msbuildProject": "../Common/Common.csproj"
     },
+    "DataAccessLib/1.0.0": {
+      "type": "project",
+      "path": "../DataAccessLib/DataAccessLib.csproj",
+      "msbuildProject": "../DataAccessLib/DataAccessLib.csproj"
+    },
     "DataServiceLib/1.0.0": {
       "type": "project",
       "path": "../DataServiceLib/DataServiceLib.csproj",
@@ -13275,6 +13309,11 @@
       "type": "project",
       "path": "../FlagpoleCRM/FlagpoleCRM.csproj",
       "msbuildProject": "../FlagpoleCRM/FlagpoleCRM.csproj"
+    },
+    "RepositoriesLib/1.0.0": {
+      "type": "project",
+      "path": "../RepositoriesLib/RepositoriesLib.csproj",
+      "msbuildProject": "../RepositoriesLib/RepositoriesLib.csproj"
     }
   },
   "projectFileDependencyGroups": {
