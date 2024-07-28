@@ -23,7 +23,7 @@ namespace DataServiceLib
     }
     public class CustomerService : ICustomerService
     {
-        private ICustomerRepository _customerRepository;
+        private readonly ICustomerRepository _customerRepository;
         public CustomerService(ICustomerRepository customerRepository)
         {
             _customerRepository = customerRepository;

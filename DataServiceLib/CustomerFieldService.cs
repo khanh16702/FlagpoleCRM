@@ -1,5 +1,6 @@
 ﻿using FlagpoleCRM.Models;
 using log4net;
+using RepositoriesLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,22 +16,20 @@ namespace DataServiceLib
     }
     public class CustomerFieldService : ICustomerFieldService
     {
-        private FlagpoleCRMContext _flagpoleCRM;
-        private readonly ILog _log;
-        public CustomerFieldService(FlagpoleCRMContext flagpoleCRM, ILog log)
+        private readonly ICustomerFieldRepository _customerFieldRepository;
+        public CustomerFieldService(ICustomerFieldRepository customerFieldRepository, ILog log)
         {
-            _flagpoleCRM = flagpoleCRM;
-            _log = log;
+            _customerFieldRepository = customerFieldRepository;
         }
 
         public List<CustomerField> GetCustomerFields()
         {
-            return _flagpoleCRM.CustomerFields.ToList();
+            return _customerFieldRepository.GetCustomerFields();
         }
 
         public string GetDataType(string fieldName)
         {
-            return _flagpoleCRM.CustomerFields.FirstOrDefault(x => x.KeyName == fieldName).DataType;
+            return _customerFieldRepository.GetDataType(fieldName);
         }
     }
 }

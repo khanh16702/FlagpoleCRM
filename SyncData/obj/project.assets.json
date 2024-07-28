@@ -4909,29 +4909,6 @@
           "lib/net6.0/ZstdSharp.dll": {}
         }
       },
-      "Common/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v6.0",
-        "dependencies": {
-          "Enums.NET": "4.0.2",
-          "MailKit": "4.3.0",
-          "Microsoft.AspNet.WebApi.Client": "6.0.0",
-          "Microsoft.AspNetCore.Mvc.Core": "2.2.5",
-          "MongoDB.Bson": "2.24.0",
-          "MongoDB.Driver": "2.24.0",
-          "MongoDB.Driver.Core": "2.24.0",
-          "Otp.NET": "1.3.0",
-          "RestSharp": "110.2.0",
-          "StackExchange.Redis": "2.6.122",
-          "System.IdentityModel.Tokens.Jwt": "6.10.0"
-        },
-        "compile": {
-          "bin/placeholder/Common.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Common.dll": {}
-        }
-      },
       "DataAccessLib/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
@@ -4949,10 +4926,10 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
-          "Common": "1.0.0",
           "DataAccessLib": "1.0.0",
           "FlagpoleCRM": "1.0.0",
           "RepositoriesLib": "1.0.0",
+          "SyncAudiences": "1.0.0",
           "log4net": "2.0.15"
         },
         "compile": {
@@ -4967,7 +4944,6 @@
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
           "Castle.DynamicLinqQueryBuilder": "1.3.3",
-          "Common": "1.0.0",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "6.0.16",
           "Microsoft.EntityFrameworkCore": "6.0.16",
           "Microsoft.EntityFrameworkCore.Relational": "6.0.16",
@@ -4975,6 +4951,7 @@
           "Microsoft.VisualStudio.Web.CodeGeneration.Design": "6.0.16",
           "Newtonsoft.Json": "13.0.3",
           "RestSharp": "110.2.0",
+          "SyncAudiences": "1.0.0",
           "log4net": "2.0.15"
         },
         "compile": {
@@ -4991,14 +4968,39 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
-          "Common": "1.0.0",
-          "FlagpoleCRM": "1.0.0"
+          "FlagpoleCRM": "1.0.0",
+          "SyncAudiences": "1.0.0"
         },
         "compile": {
           "bin/placeholder/RepositoriesLib.dll": {}
         },
         "runtime": {
           "bin/placeholder/RepositoriesLib.dll": {}
+        }
+      },
+      "SyncAudiences/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "dependencies": {
+          "DataServiceLib": "1.0.0",
+          "Enums.NET": "4.0.2",
+          "FlagpoleCRM": "1.0.0",
+          "MailKit": "4.3.0",
+          "Microsoft.AspNet.WebApi.Client": "6.0.0",
+          "Microsoft.AspNetCore.Mvc.Core": "2.2.5",
+          "MongoDB.Bson": "2.24.0",
+          "MongoDB.Driver": "2.24.0",
+          "MongoDB.Driver.Core": "2.24.0",
+          "Otp.NET": "1.3.0",
+          "RestSharp": "110.2.0",
+          "StackExchange.Redis": "2.6.122",
+          "System.IdentityModel.Tokens.Jwt": "6.10.0"
+        },
+        "compile": {
+          "bin/placeholder/SyncAudiences.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/SyncAudiences.dll": {}
         }
       }
     }
@@ -13290,11 +13292,6 @@
         "zstdsharp.port.nuspec"
       ]
     },
-    "Common/1.0.0": {
-      "type": "project",
-      "path": "../Common/Common.csproj",
-      "msbuildProject": "../Common/Common.csproj"
-    },
     "DataAccessLib/1.0.0": {
       "type": "project",
       "path": "../DataAccessLib/DataAccessLib.csproj",
@@ -13314,13 +13311,18 @@
       "type": "project",
       "path": "../RepositoriesLib/RepositoriesLib.csproj",
       "msbuildProject": "../RepositoriesLib/RepositoriesLib.csproj"
+    },
+    "SyncAudiences/1.0.0": {
+      "type": "project",
+      "path": "../Common/Common.csproj",
+      "msbuildProject": "../Common/Common.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net6.0": [
-      "Common >= 1.0.0",
       "DataServiceLib >= 1.0.0",
-      "Microsoft.Extensions.Hosting >= 6.0.1"
+      "Microsoft.Extensions.Hosting >= 6.0.1",
+      "SyncAudiences >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -13401,5 +13403,16 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.100-rc.2.22477.23\\RuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1108",
+      "level": "Error",
+      "message": "Cycle detected. \r\n  SyncData -> SyncAudiences -> FlagpoleCRM -> SyncAudiences.",
+      "libraryId": "SyncAudiences",
+      "targetGraphs": [
+        "net6.0"
+      ]
+    }
+  ]
 }
