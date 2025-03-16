@@ -361,3 +361,13 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/.vs/FlagpoleCRM/v17/.suo
+/Common/obj/Debug/net6.0/Common.assets.cache
+/Common/obj/Debug/net6.0/Common.csproj.FileListAbsolute.txt
+/DataAPI/obj/Debug/net6.0/apphost.exe
+/DataAPI/obj/Debug/net6.0/DataAPI.assets.cache
+/DataAPI/obj/Debug/net6.0/DataAPI.csproj.FileListAbsolute.txt
+/DataServiceLib/obj/Debug/net6.0/DataServiceLib.assets.cache
+/FlagpoleCRM/obj/Debug/net6.0/FlagpoleCRM.assets.cache
+/PushCustomer/obj/Debug/net6.0/PushCustomers.assets.cache
+/SyncData/obj/Debug/net6.0/SyncData.assets.cache
