@@ -1,8 +1,10 @@
 ﻿using DataAccessLib;
+using DnsClient;
 using FlagpoleCRM.Models;
 using log4net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using RepositoriesLib;
 using System;
 
@@ -28,6 +30,14 @@ namespace DataServiceLib
             services.AddTransient<ITemplateRepository, TemplateRepository>();
             services.AddTransient<ICampaignRepository, CampaignRepository>();
             services.AddTransient<IUnsubscribeRepository, UnsubscribeRepository>();
+
+            services.AddSingleton<ILog>(_ => LogManager.GetLogger(typeof(CustomerRepository)));
+            services.AddSingleton<ILog>(_ => LogManager.GetLogger(typeof(AccountRepository)));
+            services.AddSingleton<ILog>(_ => LogManager.GetLogger(typeof(WebsiteRepository)));
+            services.AddSingleton<ILog>(_ => LogManager.GetLogger(typeof(CustomerFieldRepository)));
+            services.AddSingleton<ILog>(_ => LogManager.GetLogger(typeof(TemplateRepository)));
+            services.AddSingleton<ILog>(_ => LogManager.GetLogger(typeof(CampaignRepository)));
+            services.AddSingleton<ILog>(_ => LogManager.GetLogger(typeof(UnsubscribeRepository)));
 
             return services;
         }
